@@ -1,0 +1,62 @@
+version: 1
+project: PREDI-Care
+clinical_scope: rectal-cancer-decision-support
+
+# Seuils cliniques initiaux (a calibrer sur cohortes locales)
+thresholds:
+  ace_alert_ng_ml: 5.0
+  ace_high_alert_ng_ml: 10.0
+  ace_drop_low_pct: 30.0
+  residual_alert_pct: 30.0
+  watch_wait_max_risk: 0.30
+  watch_wait_max_radiology_risk: 0.60
+
+# Poids de fusion initiaux (heuristiques)
+fusion_weights:
+  radiology: 1.20
+  biology: 1.05
+  age: 0.35
+  performance_status: 0.25
+  metastatic_flag: 0.85
+  intercept: -1.55
+
+# Regles de gouvernance (a maintenir avec staff clinique)
+rules:
+  force_radical_if_cm1: true
+  force_radical_if_tnm_high_alert: true
+  force_radical_if_residual_alert: true
+  force_radical_if_ace_alert_and_low_drop: true
+
+# Calibration statistique cible
+calibration:
+  method_candidates:
+    - platt
+    - isotonic
+    - beta
+  operating_points:
+    surveillance_rule_out_sensitivity_min: 0.95
+    surgery_rule_in_specificity_min: 0.80
+  drift_guardrails:
+    ece_max: 0.05
+    brier_max: 0.18
+
+# Qualite de modele minimale avant usage pilote
+quality_targets:
+  auc_roc_min: 0.78
+  auc_pr_min: 0.45
+  calibration_slope_range: [0.90, 1.10]
+  calibration_intercept_abs_max: 0.10
+
+# Stratifications a monitorer (equite/performance)
+subgroups:
+  age_bins: ["<50", "50-65", ">65"]
+  ecog_bins: ["0-1", "2", ">=3"]
+  stage_groups: ["cT1-2", "cT3", "cT4"]
+  nodal_groups: ["cN0", "cN1", "cN2"]
+
+# Plan de re-calibration
+recalibration:
+  trigger_months: 3
+  trigger_sample_size_min: 100
+  trigger_ece_delta: 0.02
+  trigger_brier_delta: 0.02

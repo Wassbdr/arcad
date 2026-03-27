@@ -1,0 +1,15 @@
+{
+  "include": [
+    "app.py",
+    "src",
+    "tests"
+  ],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": [
+        "src"
+      ]
+    }
+  ]
+}
