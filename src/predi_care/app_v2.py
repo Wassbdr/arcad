@@ -6,6 +6,7 @@ Premium UI - Clean, modern design.
 from __future__ import annotations
 
 import csv
+import logging
 from io import StringIO
 import plotly.graph_objects as go
 import streamlit as st
@@ -14,11 +15,15 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 from predi_care.engine.patient_types import PatientInput
-from predi_care.engine.brain_engine_v2 import BrainEngineV2, DecisionResult
+from predi_care.engine.brain_engine_v2 import DecisionResult
+from predi_care.engine.legacy_ui_adapter import LegacyUIEngine
 from predi_care.engine.mock_factory import get_preset_scenario, list_preset_scenarios
 from predi_care.data.loader import LoadResult, ValidationIssue, load_patients_from_csv_result
 from predi_care.ui.comparative_ui import render_comparative_ui
 from predi_care.export.pdf_report import generate_cohort_pdf_report, generate_pdf_report
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class SidebarSubmission(TypedDict):
@@ -51,9 +56,9 @@ class CohortSimulationEntry(TypedDict):
 
 
 @st.cache_resource
-def get_engine() -> BrainEngineV2:
-    """Get cached engine instance."""
-    return BrainEngineV2()
+def get_engine() -> LegacyUIEngine:
+    """Get cached engine instance (legacy UI adapter over v4 backend)."""
+    return LegacyUIEngine()
 
 
 def inject_local_css() -> None:
@@ -104,7 +109,7 @@ def _load_cohort_from_uploaded_file(uploaded_file: Any) -> LoadResult:
 
 
 def _run_cohort_simulation(
-    engine: BrainEngineV2,
+    engine: Any,
     load_result: LoadResult,
 ) -> tuple[list[CohortSimulationEntry], list[ValidationIssue]]:
     """Run model inference for each valid cohort patient."""
@@ -1018,6 +1023,20 @@ def main() -> None:
                 engine = get_engine()
                 result = engine.run_decision(patient_input)
                 st.session_state["result"] = result
+                if result.llm_source:
+                    logger.info("Inference mode: llm")
+                else:
+                    logger.warning("Inference mode: heuristic_fallback")
+                    fallback_alert = next(
+                        (
+                            alert
+                            for alert in result.rationale.clinical_alerts
+                            if "fallback heuristique" in alert.lower()
+                        ),
+                        None,
+                    )
+                    if fallback_alert:
+                        logger.warning("Fallback reason: %s", fallback_alert)
             except Exception:
                 st.error("La simulation a echoue. Verifiez les donnees et reessayez.")
                 return

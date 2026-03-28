@@ -80,7 +80,7 @@ def build_kaplan_meier_comparison(survival_data: Dict[str, Any]) -> go.Figure:
 
     fig.update_layout(
         title={
-            "text": "Disease-Free Survival",
+            "text": "Survie sans recidive",
             "x": 0,
             "xanchor": "left",
             "font": {"size": 16, "weight": 600},

@@ -1,34 +1,59 @@
-"""LLM Client — NVIDIA NIM API integration for medical decision support.
+"""Hybrid LLM client for clinical decision support.
 
-Connects to NVIDIA NIM API (kimi-k2-instruct) to replace heuristic-based clinical
-reasoning with LLM-powered analysis calibrated on GRECCAR / NORAD01 data.
-
-Usage:
-    response = call_medical_llm(patient_context_dict)
-    if response is None:
-        # fallback to heuristic engine
+Priority chain:
+1) OpenAI models (primary)
+2) Alternate LLM endpoint/models (fallback)
+3) Heuristic-only mode (no LLM answer)
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
+import threading
+import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Optional
+import tomllib
+import urllib.error
+import urllib.request
+
+from predi_care.engine.v4_types import RuntimeMode
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Response data model
-# ---------------------------------------------------------------------------
+
+class SafeFilter(logging.Filter):
+    """Mask configured API keys in logs."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        message = str(record.getMessage())
+        secrets_to_mask = [
+            os.environ.get("OPENAI_API_KEY", ""),
+            os.environ.get("ALT_LLM_API_KEY", ""),
+            os.environ.get("NVIDIA_API_KEY", ""),
+        ]
+        for secret in secrets_to_mask:
+            if secret:
+                message = message.replace(secret, "***")
+        record.msg = message
+        record.args = ()
+        return True
+
+
+if not any(isinstance(item, SafeFilter) for item in logger.filters):
+    logger.addFilter(SafeFilter())
+
 
 @dataclass
 class KeyFactor:
     factor: str
     value: str
-    direction: str          # "favorable" | "unfavorable" | "neutral"
-    impact_magnitude: float  # -1.0 to +1.0
+    direction: str
+    impact_magnitude: float
     evidence_source: str
 
 
@@ -43,7 +68,7 @@ class SurgeryEstimates:
     lars_risk: float
     colostomy_risk: float
     r0_probability: float
-    narrative_fr: str
+    narrative_fr: str = ""
 
 
 @dataclass
@@ -55,292 +80,465 @@ class WatchWaitEstimates:
     survival_dfs_2y: float
     survival_dfs_5y: float
     organ_preservation_2y: float
-    surveillance_burden: str   # "low" | "moderate" | "high"
-    narrative_fr: str
+    surveillance_burden: str
+    narrative_fr: str = ""
 
 
 @dataclass
 class MedicalLLMResponse:
     surgery: SurgeryEstimates
     watch_wait: WatchWaitEstimates
-    recommendation: str                # "surgery" | "watch_wait" | "multidisciplinary"
+    recommendation: str
     recommendation_rationale: str
-    uncertainty_level: str             # "low" | "moderate" | "high"
+    uncertainty_level: str
     uncertainty_reason: str
-    clinical_alerts: List[str]
-    key_factors: List[KeyFactor]
+    clinical_alerts: list[str]
+    key_factors: list[KeyFactor]
     patient_friendly_summary: str
 
 
-# ---------------------------------------------------------------------------
-# System prompt — medical knowledge base
-# ---------------------------------------------------------------------------
+@dataclass
+class LLMRuntimeResult:
+    mode_runtime: RuntimeMode
+    model_used: str
+    response: MedicalLLMResponse | None
+    errors: list[str] = field(default_factory=list)
 
-SYSTEM_PROMPT = """\
-Tu es un expert en oncologie digestive spécialisé dans le cancer du rectum \
-localement avancé (LARC). Tu maîtrises parfaitement les données des essais \
-cliniques GRECCAR 2, GRECCAR 6, GRECCAR 12, NORAD01, IWWD et OPRA.
 
-RÉFÉRENTIELS OBLIGATOIRES :
+@dataclass
+class _CircuitState:
+    failures: int = 0
+    opened_at: float | None = None
 
-CHIRURGIE RADICALE (TME) — Données GRECCAR 2 (Lancet 2017) :
-- Récidive locale à 3 ans : 7% (base de référence)
-- Complications Dindo III+ : 22% de base
-- Résection R0 : 96%
-- Stomie définitive si sphincter préservé : 10%
-- Major LARS : 28.5% post-TME
 
-WATCH & WAIT — Données IWWD / García-Aguilar 2022 :
-- Repousse locale si cCR : 20-25%
-- Repousse locale si near-CR : 40-49%
-- 93.7% des repousses surviennent avant 24 mois
-- Temps médian repousse : 9 mois
-- Chirurgie sauvetage R0 : 88-91% de succès
-- Rechute méta si repousse : 14-36%
-- Survie globale W&W à 5 ans : 85-94%
+SYSTEM_PROMPT = """
+You are an expert rectal cancer clinical decision assistant.
+Return only strict JSON with bounded probabilities in [0,100].
+Never return watch_wait when residual_size_cm > 2 or trg > 2.
+Do not include markdown in the answer.
+""".strip()
 
-MODIFICATEURS VALIDÉS :
-- TRG 4 (régression complète) : réduit récidive de ~15%
-- TRG 0-1 : augmente risque de ~20%
-- Résidu > 2cm : contre-indique W&W (critère GRECCAR)
-- CRM < 1mm : risque R1, augmente récidive de +20%
-- ACE normalisé : réduit risque systémique de ~10%
-- Délai 11 sem vs 7 sem : +12% pCR (GRECCAR 6)
-- dMMR/MSI-H : réponse complète très probable (>60%)
-- ASA ≥ 3 : complications chirurgicales ×9
-- Tabagisme actif : fistule anastomotique OR=9.69
-- Albumine < 35 g/L : +4% complications Dindo III+
-- EMVI positif : récidive systémique +8%
-- Distance < 5cm marge anale : favorise W&W (impact fonctionnel)
-- Hémoglobine < 12 g/dL : réduit efficacité RT → moins bonne réponse
-
-CONSIGNES IMPÉRATIVES :
-1. Réponds UNIQUEMENT avec un JSON valide. Aucun texte avant ou après le JSON.
-2. Toutes les probabilités sont en pourcentage (0 à 100).
-3. Calibre tes estimations sur les données ci-dessus, pas sur des valeurs génériques.
-4. Les alertes cliniques sont des phrases courtes en français médical.
-5. Le patient_friendly_summary utilise un langage accessible, sans jargon médical.
-6. Si les données sont insuffisantes pour une estimation fiable, augmente uncertainty_level.
-7. Ne jamais recommander W&W si résidu > 2cm ou TRG ≤ 1.
-"""
-
-# The JSON schema instruction appended to every user prompt
-JSON_SCHEMA_INSTRUCTION = """\
-Réponds avec un JSON valide ayant exactement cette structure :
+JSON_SCHEMA_INSTRUCTION = """
+Return this JSON schema exactly:
 {
   "surgery": {
-    "recurrence_local_2y": <float 0-100>,
-    "recurrence_local_5y": <float 0-100>,
-    "recurrence_systemic_2y": <float 0-100>,
-    "survival_dfs_2y": <float 0-100>,
-    "survival_dfs_5y": <float 0-100>,
-    "complication_rate": <float 0-100>,
-    "lars_risk": <float 0-100>,
-    "colostomy_risk": <float 0-100>,
-    "r0_probability": <float 0-100>,
-    "narrative_fr": "<string, 3 phrases en français médical>"
+    "recurrence_local_2y": <float>,
+    "recurrence_local_5y": <float>,
+    "recurrence_systemic_2y": <float>,
+    "survival_dfs_2y": <float>,
+    "survival_dfs_5y": <float>,
+    "complication_rate": <float>,
+    "lars_risk": <float>,
+    "colostomy_risk": <float>,
+    "r0_probability": <float>,
+    "narrative_fr": "<string>"
   },
   "watch_wait": {
-    "regrowth_2y": <float 0-100>,
-    "regrowth_5y": <float 0-100>,
-    "salvage_surgery_success": <float 0-100>,
-    "systemic_relapse_if_regrowth": <float 0-100>,
-    "survival_dfs_2y": <float 0-100>,
-    "survival_dfs_5y": <float 0-100>,
-    "organ_preservation_2y": <float 0-100>,
+    "regrowth_2y": <float>,
+    "regrowth_5y": <float>,
+    "salvage_surgery_success": <float>,
+    "systemic_relapse_if_regrowth": <float>,
+    "survival_dfs_2y": <float>,
+    "survival_dfs_5y": <float>,
+    "organ_preservation_2y": <float>,
     "surveillance_burden": "<low|moderate|high>",
     "narrative_fr": "<string>"
   },
   "recommendation": "<surgery|watch_wait|multidisciplinary>",
-  "recommendation_rationale": "<string, 1-2 phrases>",
+  "recommendation_rationale": "<string>",
   "uncertainty_level": "<low|moderate|high>",
   "uncertainty_reason": "<string>",
-  "clinical_alerts": ["<string>", ...],
+  "clinical_alerts": ["<string>"],
   "key_factors": [
     {
       "factor": "<string>",
       "value": "<string>",
       "direction": "<favorable|unfavorable|neutral>",
-      "impact_magnitude": <float -1.0 to 1.0>,
+      "impact_magnitude": <float>,
       "evidence_source": "<string>"
     }
   ],
-  "patient_friendly_summary": "<string, 3-4 phrases accessibles>"
+  "patient_friendly_summary": "<string>"
 }
-"""
+""".strip()
 
 
-# ---------------------------------------------------------------------------
-# API call + parsing
-# ---------------------------------------------------------------------------
-
-_PRIMARY_MODEL = "moonshotai/kimi-k2-instruct"
-_FALLBACK_MODEL = "deepseek-ai/deepseek-v3-0324"
-_BASE_URL = "https://integrate.api.nvidia.com/v1"
-_TIMEOUT_SECONDS = 20
+def _split_models(raw: str, default: list[str]) -> list[str]:
+    models = [item.strip() for item in raw.split(",") if item.strip()]
+    return models or default
 
 
-def _get_api_key() -> Optional[str]:
-    """Retrieve API key from Streamlit secrets or environment."""
+_OPENAI_MODELS = _split_models(
+    os.environ.get("OPENAI_PRIMARY_MODELS", "gpt-4o,o3-mini"),
+    ["gpt-4o", "o3-mini"],
+)
+_ALT_MODELS = _split_models(
+    os.environ.get(
+        "ALT_FALLBACK_MODELS",
+        "moonshotai/kimi-k2-instruct,deepseek-ai/deepseek-v3.1,glm-4.7,mistral-large-3,qwen3-coder",
+    ),
+    [
+        "moonshotai/kimi-k2-instruct",
+        "deepseek-ai/deepseek-v3.1",
+        "glm-4.7",
+        "mistral-large-3",
+        "qwen3-coder",
+    ],
+)
+
+_OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+_ALT_BASE_URL = os.environ.get("ALT_LLM_BASE_URL", "https://integrate.api.nvidia.com/v1")
+_TIMEOUT_SECONDS = float(os.environ.get("LLM_TIMEOUT_SECONDS", "20"))
+_MAX_RETRIES = max(1, int(os.environ.get("LLM_MAX_RETRIES", "2")))
+_CIRCUIT_FAILURES = max(1, int(os.environ.get("LLM_CIRCUIT_FAILURES", "3")))
+_CIRCUIT_RESET_SECONDS = max(10, int(os.environ.get("LLM_CIRCUIT_RESET_SECONDS", "90")))
+_CACHE_TTL_SECONDS = max(30, int(os.environ.get("LLM_CACHE_TTL_SECONDS", "300")))
+_CACHE_MAX_ITEMS = max(32, int(os.environ.get("LLM_CACHE_MAX_ITEMS", "256")))
+
+_cache_lock = threading.Lock()
+_cache: dict[str, tuple[float, LLMRuntimeResult]] = {}
+_circuits = {
+    "openai": _CircuitState(),
+    "alt_llm": _CircuitState(),
+}
+_local_secret_cache: dict[str, str] | None = None
+_local_secret_fingerprint: tuple[tuple[str, float], ...] | None = None
+
+
+def _secret_candidates() -> list[Path]:
+    return [
+        Path.cwd() / ".streamlit" / "secrets.toml",
+        Path.cwd() / ".streamlit" / ".secrets.toml",
+        Path.cwd() / ".streamlit" / ".secret.toml",
+    ]
+
+
+def _secret_fingerprint() -> tuple[tuple[str, float], ...]:
+    entries: list[tuple[str, float]] = []
+    for candidate in _secret_candidates():
+        if not candidate.exists():
+            continue
+        try:
+            entries.append((str(candidate), float(candidate.stat().st_mtime)))
+        except OSError:
+            continue
+    return tuple(entries)
+
+
+def _get_streamlit_secret(name: str) -> Optional[str]:
     try:
         import streamlit as st
-        key = st.secrets.get("NVIDIA_API_KEY")
-        if key:
-            return str(key)
+
+        value = st.secrets.get(name)
+        if value:
+            return str(value)
     except Exception:
         pass
-    return os.environ.get("NVIDIA_API_KEY")
+
+    global _local_secret_cache, _local_secret_fingerprint
+    current_fingerprint = _secret_fingerprint()
+    if _local_secret_cache is None or _local_secret_fingerprint != current_fingerprint:
+        _local_secret_cache = {}
+        _local_secret_fingerprint = current_fingerprint
+        for candidate in _secret_candidates():
+            if not candidate.exists():
+                continue
+            try:
+                with candidate.open("rb") as handle:
+                    parsed = tomllib.load(handle)
+                for key, raw_value in parsed.items():
+                    _local_secret_cache[str(key)] = str(raw_value)
+            except Exception:
+                continue
+    if _local_secret_cache is not None and name in _local_secret_cache:
+        return _local_secret_cache[name]
+    return None
 
 
-def _build_user_prompt(patient_data: Dict[str, Any]) -> str:
-    """Build the user prompt with patient context and JSON schema instruction."""
-    patient_json = json.dumps(patient_data, ensure_ascii=False, indent=2)
+def _get_openai_api_key() -> Optional[str]:
+    return _get_streamlit_secret("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+
+
+def _get_alt_api_key() -> Optional[str]:
     return (
-        "Voici les données du patient :\n"
-        f"```json\n{patient_json}\n```\n\n"
-        f"{JSON_SCHEMA_INSTRUCTION}"
+        _get_streamlit_secret("ALT_LLM_API_KEY")
+        or os.environ.get("ALT_LLM_API_KEY")
+        or _get_streamlit_secret("NVIDIA_API_KEY")
+        or os.environ.get("NVIDIA_API_KEY")
     )
 
 
-def _extract_json_from_text(text: str) -> dict:
-    """Extract JSON from LLM output, handling potential markdown fences."""
-    text = text.strip()
-    # Strip markdown fences if present
-    if text.startswith("```"):
-        lines = text.split("\n")
-        # Remove first line (```json or ```) and last line (```)
-        start = 1
-        end = len(lines)
-        for i in range(len(lines) - 1, -1, -1):
-            if lines[i].strip() == "```":
-                end = i
-                break
-        text = "\n".join(lines[start:end]).strip()
-    return json.loads(text)
+def _get_api_key() -> Optional[str]:
+    """Backward-compatible key resolver used by legacy tests."""
+    return _get_openai_api_key() or _get_alt_api_key()
+
+
+def _build_user_prompt(patient_data: dict[str, Any]) -> str:
+    payload = json.dumps(patient_data, ensure_ascii=False, sort_keys=True)
+    return f"Patient context: {payload}\n\n{JSON_SCHEMA_INSTRUCTION}"
+
+
+def _extract_json_from_text(text: str) -> dict[str, Any]:
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        lines = cleaned.splitlines()
+        if len(lines) >= 3:
+            cleaned = "\n".join(lines[1:-1]).strip()
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start >= 0 and end >= start:
+        cleaned = cleaned[start : end + 1]
+    return json.loads(cleaned)
 
 
 def _clamp(value: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, value))
 
 
-def _validate_and_parse(raw: dict) -> MedicalLLMResponse:
-    """Validate and parse the raw JSON dict into a MedicalLLMResponse."""
+def _validate_and_parse(raw: dict[str, Any]) -> MedicalLLMResponse:
+    surgery_raw = raw.get("surgery", {})
+    watch_wait_raw = raw.get("watch_wait", {})
 
-    s = raw["surgery"]
     surgery = SurgeryEstimates(
-        recurrence_local_2y=_clamp(float(s["recurrence_local_2y"]), 0, 100),
-        recurrence_local_5y=_clamp(float(s["recurrence_local_5y"]), 0, 100),
-        recurrence_systemic_2y=_clamp(float(s["recurrence_systemic_2y"]), 0, 100),
-        survival_dfs_2y=_clamp(float(s["survival_dfs_2y"]), 0, 100),
-        survival_dfs_5y=_clamp(float(s["survival_dfs_5y"]), 0, 100),
-        complication_rate=_clamp(float(s["complication_rate"]), 0, 100),
-        lars_risk=_clamp(float(s["lars_risk"]), 0, 100),
-        colostomy_risk=_clamp(float(s["colostomy_risk"]), 0, 100),
-        r0_probability=_clamp(float(s["r0_probability"]), 0, 100),
-        narrative_fr=str(s.get("narrative_fr", "")),
+        recurrence_local_2y=_clamp(float(surgery_raw.get("recurrence_local_2y", 0.0)), 0.0, 100.0),
+        recurrence_local_5y=_clamp(float(surgery_raw.get("recurrence_local_5y", 0.0)), 0.0, 100.0),
+        recurrence_systemic_2y=_clamp(float(surgery_raw.get("recurrence_systemic_2y", 0.0)), 0.0, 100.0),
+        survival_dfs_2y=_clamp(float(surgery_raw.get("survival_dfs_2y", 0.0)), 0.0, 100.0),
+        survival_dfs_5y=_clamp(float(surgery_raw.get("survival_dfs_5y", 0.0)), 0.0, 100.0),
+        complication_rate=_clamp(float(surgery_raw.get("complication_rate", 0.0)), 0.0, 100.0),
+        lars_risk=_clamp(float(surgery_raw.get("lars_risk", 0.0)), 0.0, 100.0),
+        colostomy_risk=_clamp(float(surgery_raw.get("colostomy_risk", 0.0)), 0.0, 100.0),
+        r0_probability=_clamp(float(surgery_raw.get("r0_probability", 0.0)), 0.0, 100.0),
+        narrative_fr=str(surgery_raw.get("narrative_fr", "")),
     )
 
-    w = raw["watch_wait"]
     watch_wait = WatchWaitEstimates(
-        regrowth_2y=_clamp(float(w["regrowth_2y"]), 0, 100),
-        regrowth_5y=_clamp(float(w["regrowth_5y"]), 0, 100),
-        salvage_surgery_success=_clamp(float(w["salvage_surgery_success"]), 0, 100),
-        systemic_relapse_if_regrowth=_clamp(float(w["systemic_relapse_if_regrowth"]), 0, 100),
-        survival_dfs_2y=_clamp(float(w["survival_dfs_2y"]), 0, 100),
-        survival_dfs_5y=_clamp(float(w["survival_dfs_5y"]), 0, 100),
-        organ_preservation_2y=_clamp(float(w["organ_preservation_2y"]), 0, 100),
-        surveillance_burden=str(w.get("surveillance_burden", "moderate")),
-        narrative_fr=str(w.get("narrative_fr", "")),
+        regrowth_2y=_clamp(float(watch_wait_raw.get("regrowth_2y", 0.0)), 0.0, 100.0),
+        regrowth_5y=_clamp(float(watch_wait_raw.get("regrowth_5y", 0.0)), 0.0, 100.0),
+        salvage_surgery_success=_clamp(
+            float(watch_wait_raw.get("salvage_surgery_success", 0.0)), 0.0, 100.0
+        ),
+        systemic_relapse_if_regrowth=_clamp(
+            float(watch_wait_raw.get("systemic_relapse_if_regrowth", 0.0)), 0.0, 100.0
+        ),
+        survival_dfs_2y=_clamp(float(watch_wait_raw.get("survival_dfs_2y", 0.0)), 0.0, 100.0),
+        survival_dfs_5y=_clamp(float(watch_wait_raw.get("survival_dfs_5y", 0.0)), 0.0, 100.0),
+        organ_preservation_2y=_clamp(float(watch_wait_raw.get("organ_preservation_2y", 0.0)), 0.0, 100.0),
+        surveillance_burden=str(watch_wait_raw.get("surveillance_burden", "moderate")),
+        narrative_fr=str(watch_wait_raw.get("narrative_fr", "")),
     )
 
-    key_factors: List[KeyFactor] = []
-    for kf in raw.get("key_factors", []):
-        key_factors.append(KeyFactor(
-            factor=str(kf.get("factor", "")),
-            value=str(kf.get("value", "")),
-            direction=str(kf.get("direction", "neutral")),
-            impact_magnitude=_clamp(float(kf.get("impact_magnitude", 0)), -1, 1),
-            evidence_source=str(kf.get("evidence_source", "")),
-        ))
+    factors: list[KeyFactor] = []
+    for factor_raw in raw.get("key_factors", []):
+        factors.append(
+            KeyFactor(
+                factor=str(factor_raw.get("factor", "")),
+                value=str(factor_raw.get("value", "")),
+                direction=str(factor_raw.get("direction", "neutral")),
+                impact_magnitude=_clamp(float(factor_raw.get("impact_magnitude", 0.0)), -1.0, 1.0),
+                evidence_source=str(factor_raw.get("evidence_source", "")),
+            )
+        )
+
+    recommendation = str(raw.get("recommendation", "multidisciplinary"))
+    if recommendation not in {"surgery", "watch_wait", "multidisciplinary"}:
+        recommendation = "multidisciplinary"
+
+    uncertainty = str(raw.get("uncertainty_level", "high")).lower()
+    if uncertainty not in {"low", "moderate", "high"}:
+        uncertainty = "high"
 
     return MedicalLLMResponse(
         surgery=surgery,
         watch_wait=watch_wait,
-        recommendation=str(raw.get("recommendation", "multidisciplinary")),
+        recommendation=recommendation,
         recommendation_rationale=str(raw.get("recommendation_rationale", "")),
-        uncertainty_level=str(raw.get("uncertainty_level", "high")),
+        uncertainty_level=uncertainty,
         uncertainty_reason=str(raw.get("uncertainty_reason", "")),
-        clinical_alerts=[str(a) for a in raw.get("clinical_alerts", [])],
-        key_factors=key_factors,
+        clinical_alerts=[str(item) for item in raw.get("clinical_alerts", [])],
+        key_factors=factors,
         patient_friendly_summary=str(raw.get("patient_friendly_summary", "")),
     )
 
 
-def _call_api(patient_data: Dict[str, Any], model: str) -> Optional[MedicalLLMResponse]:
-    """Make a single API call and parse the response. Returns None on failure."""
-    from openai import OpenAI
+def _context_hash(patient_data: dict[str, Any]) -> str:
+    blob = json.dumps(patient_data, sort_keys=True, ensure_ascii=False, default=str)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
-    api_key = _get_api_key()
-    if not api_key:
-        logger.warning("NVIDIA_API_KEY not configured — skipping LLM call")
-        return None
 
-    client = OpenAI(base_url=_BASE_URL, api_key=api_key)
-    user_prompt = _build_user_prompt(patient_data)
+def _cache_get(key: str) -> Optional[LLMRuntimeResult]:
+    with _cache_lock:
+        item = _cache.get(key)
+        if item is None:
+            return None
+        ts, result = item
+        if (time.time() - ts) > _CACHE_TTL_SECONDS:
+            _cache.pop(key, None)
+            return None
+        return result
 
-    max_attempts = 2  # 1 retry on JSON parse error
-    for attempt in range(max_attempts):
+
+def _cache_put(key: str, value: LLMRuntimeResult) -> None:
+    with _cache_lock:
+        if len(_cache) >= _CACHE_MAX_ITEMS:
+            oldest_key = min(_cache.keys(), key=lambda existing: _cache[existing][0])
+            _cache.pop(oldest_key, None)
+        _cache[key] = (time.time(), value)
+
+
+def _circuit_open(provider: str) -> bool:
+    state = _circuits[provider]
+    if state.opened_at is None:
+        return False
+    if (time.time() - state.opened_at) > _CIRCUIT_RESET_SECONDS:
+        state.failures = 0
+        state.opened_at = None
+        return False
+    return True
+
+
+def _record_success(provider: str) -> None:
+    state = _circuits[provider]
+    state.failures = 0
+    state.opened_at = None
+
+
+def _record_failure(provider: str) -> None:
+    state = _circuits[provider]
+    state.failures += 1
+    if state.failures >= _CIRCUIT_FAILURES:
+        state.opened_at = time.time()
+
+
+def _call_model(
+    *,
+    api_key: str,
+    base_url: str,
+    model: str,
+    patient_data: dict[str, Any],
+) -> MedicalLLMResponse:
+    prompt = _build_user_prompt(patient_data)
+    endpoint = base_url.rstrip("/") + "/chat/completions"
+
+    last_error: Exception | None = None
+    for _ in range(_MAX_RETRIES):
         try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
+            body = {
+                "model": model,
+                "messages": [
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt},
+                    {"role": "user", "content": prompt},
                 ],
-                temperature=0.3,
-                max_tokens=4096,
-                timeout=_TIMEOUT_SECONDS,
+                "temperature": 0.2,
+                "max_tokens": 1400,
+            }
+            req = urllib.request.Request(
+                endpoint,
+                data=json.dumps(body).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                method="POST",
             )
-            content = response.choices[0].message.content or ""
-            raw = _extract_json_from_text(content)
-            return _validate_and_parse(raw)
-
-        except json.JSONDecodeError as exc:
-            logger.warning("LLM returned invalid JSON (attempt %d): %s", attempt + 1, exc)
-            if attempt == max_attempts - 1:
-                return None
+            with urllib.request.urlopen(req, timeout=_TIMEOUT_SECONDS) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            content = (
+                payload.get("choices", [{}])[0]
+                .get("message", {})
+                .get("content", "{}")
+            )
+            return _validate_and_parse(_extract_json_from_text(content))
+        except (
+            json.JSONDecodeError,
+            TimeoutError,
+            ConnectionError,
+            ValueError,
+            RuntimeError,
+            urllib.error.HTTPError,
+            urllib.error.URLError,
+        ) as exc:
+            last_error = exc
+            continue
+        except Exception as exc:  # pragma: no cover - provider-specific runtime errors
+            last_error = exc
             continue
 
-        except Exception as exc:
-            logger.error("LLM API call failed (model=%s, attempt=%d): %s", model, attempt + 1, exc)
-            return None
-
-    return None
+    raise RuntimeError(f"Model call failed for {model}: {type(last_error).__name__ if last_error else 'unknown'}")
 
 
-def call_medical_llm(patient_data: Dict[str, Any]) -> Optional[MedicalLLMResponse]:
-    """Call the medical LLM with patient data and return structured response.
+def call_medical_llm_with_runtime(patient_data: dict[str, Any]) -> LLMRuntimeResult:
+    if os.environ.get("LLM_FORCE_HEURISTIC", "0") == "1":
+        return LLMRuntimeResult(mode_runtime="heuristic", model_used="heuristic", response=None, errors=["forced"])
 
-    Tries the primary model first, then the fallback model.
-    Returns None if both fail (caller should use heuristic engine).
+    key = _context_hash(patient_data)
+    cached = _cache_get(key)
+    if cached is not None and cached.mode_runtime != "heuristic":
+        return cached
 
-    Args:
-        patient_data: Dict with keys "clinical", "response", "imaging",
-                      "biology", "comorbidities".
+    errors: list[str] = []
 
-    Returns:
-        MedicalLLMResponse or None on failure.
-    """
-    # Try primary model
-    result = _call_api(patient_data, _PRIMARY_MODEL)
-    if result is not None:
-        return result
+    openai_key = _get_openai_api_key()
+    if openai_key and not _circuit_open("openai"):
+        for model in _OPENAI_MODELS:
+            try:
+                response = _call_model(
+                    api_key=openai_key,
+                    base_url=_OPENAI_BASE_URL,
+                    model=model,
+                    patient_data=patient_data,
+                )
+                _record_success("openai")
+                result = LLMRuntimeResult(
+                    mode_runtime="openai",
+                    model_used=model,
+                    response=response,
+                    errors=errors,
+                )
+                _cache_put(key, result)
+                return result
+            except Exception as exc:
+                _record_failure("openai")
+                errors.append(f"openai:{model}:{type(exc).__name__}")
+    else:
+        errors.append("openai:unavailable")
 
-    # Try fallback model
-    logger.info("Primary model failed, trying fallback model %s", _FALLBACK_MODEL)
-    result = _call_api(patient_data, _FALLBACK_MODEL)
-    if result is not None:
-        return result
+    alt_key = _get_alt_api_key()
+    if alt_key and not _circuit_open("alt_llm"):
+        for model in _ALT_MODELS:
+            try:
+                response = _call_model(
+                    api_key=alt_key,
+                    base_url=_ALT_BASE_URL,
+                    model=model,
+                    patient_data=patient_data,
+                )
+                _record_success("alt_llm")
+                result = LLMRuntimeResult(
+                    mode_runtime="alt_llm",
+                    model_used=model,
+                    response=response,
+                    errors=errors,
+                )
+                _cache_put(key, result)
+                return result
+            except Exception as exc:
+                _record_failure("alt_llm")
+                errors.append(f"alt_llm:{model}:{type(exc).__name__}")
+    else:
+        errors.append("alt_llm:unavailable")
 
-    logger.warning("Both LLM models failed — will use heuristic fallback")
-    return None
+    result = LLMRuntimeResult(
+        mode_runtime="heuristic",
+        model_used="heuristic",
+        response=None,
+        errors=errors,
+    )
+    return result
+
+
+def call_medical_llm(patient_data: dict[str, Any]) -> Optional[MedicalLLMResponse]:
+    """Backward-compatible facade used by v2 engine/tests."""
+    if _get_api_key() is None:
+        return None
+    return call_medical_llm_with_runtime(patient_data).response

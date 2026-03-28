@@ -1,4 +1,4 @@
-"""PREDI-Care Application Launcher."""
+"""PREDI-Care application launcher."""
 from pathlib import Path
 import sys
 

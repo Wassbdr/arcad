@@ -1,130 +1,87 @@
 # MEDICAL_LOGIC_REF
 
-## Objet
-Reference de logique medicale pour PREDI-Care (prototype hackathon) sur le dilemme therapeutique du cancer du rectum:
-- Chirurgie radicale
-- Surveillance active Watch and Wait
+## Scope
+This document defines v4 prototype rules for PREDI-Care:
+- tabular Digital Twin inference
+- multi-agent orchestration
+- deterministic safety envelope
 
-Cadre de travail:
-- Inspiration des pratiques de discussion pluridisciplinaire type GRECCAR
-- Donnees cles: cTNM, cinetique ACE, residu tumoral IRM
-- Usage: support a la decision, non substitut au jugement clinique
+The tool is clinical decision support, not an autonomous medical device.
 
-## Variables cliniques et biologiques clefs
+## Hard Clinical Rules
+- `watch_wait` is forbidden when `residual_size_cm > 2.0`.
+- `watch_wait` is forbidden when `TRG > 2`.
+- `cM1` forces `multidisciplinary`.
+- `ECOG = 4` forces `multidisciplinary`.
+- all probabilities must remain in `[0, 100]`.
+- survival curves must be monotone non-increasing.
+- on critical invariant breach, final recommendation is forced to `multidisciplinary`.
 
-### 1) Stade cTNM
-- cT:
-  - cT1-cT2: risque local plutot faible a intermediaire
-  - cT3: risque intermediaire a eleve
-  - cT4: risque eleve
-- cN:
-  - cN0: favorable
-  - cN1-cN2: aggravation du risque
-- cM:
-  - cM0: pas de metastase detectee
-  - cM1: haut risque, discussion therapeutique differente
+## Decision Thresholds
+- Residual lesion:
+  - `<= 1 cm`: favorable for organ preservation
+  - `1-2 cm`: borderline
+  - `> 2 cm`: hard block for watch and wait
+- TRG:
+  - `1-2`: favorable for watch and wait
+  - `3`: intermediate, usually multidisciplinary discussion
+  - `4-5`: unfavorable, surgery-centered strategy
+- CRM:
+  - `< 1 mm`: positive risk state
+  - `1-2 mm`: threatened
+  - `>= 2 mm`: negative
+- ACE trend:
+  - normalized or major drop: favorable
+  - persistent elevation: unfavorable
 
-Regle simplifiee de vigilance:
-- Alerte forte si cT4, cN2, ou cM1
+## Complication Typology
 
-### 2) Cinetique ACE (CEA)
-Unite: ng/mL
+### Surgery branch
+- LARS syndrome
+- anastomotic leak
+- infectious complication
+- urinary dysfunction
+- stoma-related complication
+- medical systemic complication
 
-Seuils de reference proposes pour le prototype:
-- ACE <= 5 ng/mL: zone rassurante
-- ACE > 5 ng/mL: alerte biologique
-- ACE >= 10 ng/mL: alerte renforcee
+### Watch and Wait branch
+- local regrowth risk
+- conditional systemic relapse risk after regrowth
+- surveillance burden
+- anxiety burden linked to follow-up
 
-Dynamique:
-- Baisse >= 50-60% apres traitement: favorable
-- Baisse 30-50%: intermediaire
-- Baisse < 30% ou hausse: signal defavorable
+Each reported risk must expose:
+- value
+- source (`dataset`, `simulated`, `derived`, `llm`)
+- confidence
+- supporting factors
 
-Regle simplifiee de vigilance:
-- Alerte forte si ACE actuel > 5 ng/mL et baisse < 30%
+## Multi-Agent Governance
+Agents:
+- Radiology
+- Biology
+- SurgeryRisk
+- WatchWait
+- Comorbidity
+- EthicsRules
+- Coordinator
 
-### 3) Residu tumoral IRM
-Mesure simplifiee en ratio de residu tumoral (%)
+Arbitration:
+- low disagreement: automatic consensus
+- medium disagreement: consensus + warning
+- high disagreement: multidisciplinary escalation
 
-Seuils proposes:
-- < 10%: reponse tres favorable
-- 10-30%: reponse partielle acceptable
-- 30-50%: residu significatif
-- > 50%: residu important, risque eleve
+Safety authority:
+- EthicsRules and SafetyEnvelopeChecker can override recommendation.
 
-Regle simplifiee de vigilance:
-- Alerte forte si residu tumoral > 30%
+## Fallback Policy
+- primary runtime: OpenAI models
+- secondary runtime: alternate LLM providers
+- final fallback: heuristic-only mode
+- runtime mode must be surfaced in UI (`openai`, `alt_llm`, `heuristic`)
 
-## Matrice de risque (prototype)
-
-### Risque faible
-Conditions typiques:
-- cT1-cT2, cN0, cM0
-- ACE <= 5 et en baisse significative
-- Residu tumoral faible (< 10-20%)
-
-Orientation possible:
-- Surveillance active discutee si concordance clinico-radiobiologique
-
-### Risque intermediaire
-Conditions typiques:
-- cT3 ou cN1
-- ACE limite ou baisse partielle
-- Residu tumoral 20-40%
-
-Orientation possible:
-- Decision individualisee en RCP selon comorbidites, preference patient, qualite imagerie
-
-### Risque eleve
-Conditions typiques:
-- cT4, cN2, cM1, ou discordance majeure des signaux
-- ACE > 5 persistant / en hausse
-- Residu tumoral > 30-50%
-
-Orientation possible:
-- Tendance vers strategie de controle local maximal (chirurgie) ou adaptation oncologique selon contexte
-
-## Regles de fusion multi-agent recommandees
-
-### Agent Radiologue
-Entrées:
-- cT, cN, cM
-- ratio de residu tumoral
-
-Sorties:
-- score_radiologique (0-1)
-- confiance_radiologique
-
-### Agent Biologiste
-Entrées:
-- ACE baseline
-- ACE actuel
-
-Sorties:
-- score_biologique (0-1)
-- dynamique (favorable, intermediaire, defavorable)
-
-### Agent Coordinateur
-Fonctions:
-- fusionner score_radiologique + score_biologique + variables cliniques
-- detecter les conflits de donnees
-- produire recommandation finale et justification
-
-Politique de gestion des conflits:
-- Si conflit fort (ex: IRM favorable mais ACE en hausse persistante), marquer "incertitude elevee" et recommander reevaluation rapprochee
-- Si cM1, prioriser la logique oncologique globale et diminuer la confiance du mode "watch and wait"
-
-## Niveau de confiance suggere
-- Eleve: signaux concordants et complets
-- Moyen: discordance mineure ou donnee limite
-- Faible: discordance majeure, donnees manquantes, ou qualite imagerie insuffisante
-
-## Limites et gouvernance
-- Reference simplifiee pour prototype hackathon
-- Ne remplace pas les recommandations officielles, protocoles locaux, ni l'avis d'une RCP
-- Toute recommendation doit etre revue et validee par cliniciens experts
-
-## Sources de validation interne a prevoir
-- Relecture par experts cliniques du projet
-- Ajustement des seuils selon retours terrain
-- Traçabilite des changements de logique dans le repo
+## Counterfactual Standard
+The explanation layer must provide actionable "minimal change" statements, e.g.:
+- residual lesion reduction needed for watch and wait eligibility
+- TRG threshold required to unlock watch and wait
+- ACE reduction needed to improve watch and wait score

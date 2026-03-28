@@ -22,6 +22,7 @@ class _PatientInputRequired(TypedDict):
 class PatientInput(_PatientInputRequired, total=False):
     """Extended clinical variables used by advanced heuristics and LLM context."""
 
+    residual_size_cm: float
     distance_marge_anale: float
     delay_weeks_post_rct: int
     protocol_neoadjuvant: str

@@ -1,10 +1,8 @@
-"""Comparative UI Module - Premium Dual-Panel Clinical Decision Interface.
-
-Modern, visually impactful design without emoji overload.
-"""
+"""Module UI comparatif historique, connecte au moteur v4 via adaptateur."""
 
 from __future__ import annotations
 
+import html
 import streamlit as st
 from typing import Any
 
@@ -18,10 +16,7 @@ def render_comparative_ui(result: DecisionResult) -> None:
     # 1. Recommendation Banner
     _render_recommendation_banner(result)
 
-    # 1b. LLM / Fallback badge
-    _render_source_badge(result)
-
-    # 1c. Patient-friendly summary (LLM)
+    # 1b. Patient-friendly summary (LLM)
     _render_patient_summary(result)
 
     # 2. Dual Panel Comparison
@@ -29,7 +24,7 @@ def render_comparative_ui(result: DecisionResult) -> None:
 
     # 3. Survival Curves (full width)
     st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
-    _render_section_header("Courbes de Survie", "Comparaison Disease-Free Survival")
+    _render_section_header("Courbes de Survie", "Comparaison de la survie sans recidive")
     st.plotly_chart(
         _get_km_comparison_chart(result),
         width="stretch",
@@ -145,7 +140,7 @@ def _render_recommendation_banner(result: DecisionResult) -> None:
         unsafe_allow_html=True,
     )
 
-    # Rationale in clean card
+    clinician_summary = html.escape(_build_clinician_summary(result)).replace("\n", "<br>")
     st.markdown(
         f"""
         <div style="
@@ -155,8 +150,18 @@ def _render_recommendation_banner(result: DecisionResult) -> None:
             border-radius: 0 8px 8px 0;
             margin-bottom: 1.5rem;
         ">
+            <p style="
+                margin: 0 0 0.45rem;
+                color: #5E6C84;
+                font-size: 0.72rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            ">
+                Synthese pour l'equipe
+            </p>
             <p style="margin: 0; color: #1A1D21; font-size: 0.95rem; line-height: 1.5;">
-                {result.rationale.recommendation_text}
+                {clinician_summary}
             </p>
         </div>
         """,
@@ -164,29 +169,297 @@ def _render_recommendation_banner(result: DecisionResult) -> None:
     )
 
 
-def _render_source_badge(result: DecisionResult) -> None:
-    """Render a badge indicating whether the recommendation came from LLM or heuristic fallback."""
-    if result.llm_source:
-        badge_html = """
-        <div style="display: inline-block; background: #EEEBFF; color: #402E8A; font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 100px; margin-bottom: 2rem;">
-            🤖 Analyse IA (NVIDIA NIM)
-        </div>
-        """
-    else:
-        badge_html = """
-        <div style="display: inline-block; background: #FFF4E5; color: #B25A00; font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 100px; margin-bottom: 2rem;">
-            ⚙️ Mode Heuristique (Fallback)
-        </div>
-        """
-    st.markdown(badge_html, unsafe_allow_html=True)
-
-
 def _render_patient_summary(result: DecisionResult) -> None:
-    """Render the patient friendly summary from the LLM if available."""
-    if result.llm_response and result.llm_response.patient_friendly_summary:
-        st.markdown("### Resume pour le patient")
-        st.info(result.llm_response.patient_friendly_summary, icon="ℹ️")
-        st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+    """Render a plain-language patient summary without alert styling."""
+    summary = _resolve_patient_summary(result)
+    if not summary:
+        return
+
+    safe_summary = html.escape(summary).replace("\n", "<br>")
+    st.markdown("### Resume pour le patient")
+    st.markdown(
+        f"""
+        <div style="
+            background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+            border: 1px solid #D9E2EC;
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        ">
+            <p style="margin: 0; color: #1A1D21; font-size: 0.98rem; line-height: 1.65;">
+                {safe_summary}
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    _render_patient_scenario_cards(result)
+
+
+def _resolve_patient_summary(result: DecisionResult) -> str:
+    """Return the deterministic patient-friendly summary."""
+    return _build_patient_summary_fallback(result)
+
+
+def _is_generic_patient_summary(summary: str) -> bool:
+    normalized = " ".join(summary.lower().split())
+    generic_markers = (
+        "jumeau numerique clinique multi-agent",
+        "jumeau numérique clinique multi-agent",
+        "decision therapeutique finale doit etre validee en reunion pluridisciplinaire",
+        "decision thérapeutique finale doit être validée en réunion pluridisciplinaire",
+        "decision finale doit etre validee",
+        "decision finale doit etre discutee en rcp",
+    )
+    return not normalized or any(marker in normalized for marker in generic_markers)
+
+
+def _is_patient_friendly_llm_summary(summary: str) -> bool:
+    normalized = " ".join(summary.lower().split())
+    technical_markers = (
+        "mrtrg",
+        "trg",
+        "eligibilite",
+        "eligibility",
+        "contrefactuel",
+        "counterfactual",
+        "pluridisciplinaire",
+        "multi-agent",
+        "protocolaire",
+        "dfs",
+        "rcp",
+    )
+    return not any(marker in normalized for marker in technical_markers)
+
+
+def _build_clinician_summary(result: DecisionResult) -> str:
+    segments: list[str] = []
+
+    recommendation_text = str(result.rationale.recommendation_text or "").strip()
+    if recommendation_text:
+        segments.append(recommendation_text)
+
+    primary_descriptions = [
+        str(description).strip()
+        for _, _, description in result.rationale.primary_factors[:2]
+        if str(description).strip()
+    ]
+    if primary_descriptions:
+        segments.append("Facteurs dominants: " + " ; ".join(primary_descriptions) + ".")
+
+    if result.rationale.clinical_alerts:
+        segments.append(f"Alerte principale: {result.rationale.clinical_alerts[0]}.")
+
+    return " ".join(segment.strip() for segment in segments if segment.strip())
+
+
+def _build_patient_summary_fallback(result: DecisionResult) -> str:
+    patient = result.patient_input
+    recommendation = result.recommended_scenario
+
+    residual_ratio = float(patient.get("residual_tumor_ratio", 0.0))
+    residual_cm = float(patient.get("residual_size_cm", residual_ratio / 20.0))
+    mrtrg = int(patient.get("mrtrg", 3))
+    ace_baseline = float(patient.get("ace_baseline", 0.0))
+    ace_current = float(patient.get("ace_current", 0.0))
+
+    response_sentence = _build_response_sentence(
+        residual_cm=residual_cm,
+        residual_ratio=residual_ratio,
+        mrtrg=mrtrg,
+        ace_baseline=ace_baseline,
+        ace_current=ace_current,
+    )
+
+    if recommendation == "watch_and_wait":
+        return " ".join(
+            [
+                "Aujourd'hui, l'equipe pense qu'il est possible d'eviter une operation tout de suite.",
+                response_sentence,
+                "Cela demande en contrepartie des controles tres reguliers pendant les prochaines annees.",
+            ]
+        )
+
+    if recommendation == "surgery":
+        return " ".join(
+            [
+                "Aujourd'hui, l'equipe penche plutot pour une operation.",
+                response_sentence,
+                "L'idee est d'enlever ce qui reste pour diminuer au maximum le risque que la maladie revienne.",
+            ]
+        )
+
+    return " ".join(
+        [
+            "Aujourd'hui, deux choix restent possibles: une operation ou une surveillance tres rapprochee.",
+            response_sentence,
+            "La decision depend surtout de ce que vous preferez entre plus de securite tout de suite, ou eviter l'operation mais accepter des controles frequents.",
+        ]
+    )
+
+
+def _build_response_sentence(
+    *,
+    residual_cm: float,
+    residual_ratio: float,
+    mrtrg: int,
+    ace_baseline: float,
+    ace_current: float,
+) -> str:
+    if residual_cm <= 0.5 or residual_ratio <= 10.0 or mrtrg <= 1:
+        response = (
+            f"Le traitement semble avoir tres bien marche et il reste tres peu de chose visible, environ {residual_cm:.1f} cm."
+        )
+    elif residual_cm >= 2.0 or residual_ratio >= 50.0 or mrtrg >= 4:
+        response = (
+            f"Le traitement a aide, mais il reste encore une zone d'environ {residual_cm:.1f} cm."
+        )
+    else:
+        response = (
+            f"Le traitement a plutot bien marche, mais il reste encore une petite zone d'environ {residual_cm:.1f} cm."
+        )
+
+    if ace_baseline > 0.0:
+        if ace_current <= ace_baseline - 1.0:
+            response += " La prise de sang va plutot dans le bon sens."
+        elif ace_current >= ace_baseline + 1.0 or ace_current > 5.0:
+            response += " La prise de sang pousse a rester prudent."
+
+    return response
+
+
+def _render_patient_scenario_cards(result: DecisionResult) -> None:
+    cards = _build_patient_scenario_cards(result)
+    st.markdown(
+        """
+        <div style="margin: 0.25rem 0 0.9rem;">
+            <p style="
+                margin: 0;
+                color: #5E6C84;
+                font-size: 0.82rem;
+                font-weight: 600;
+                letter-spacing: 0.02em;
+            ">
+                Deux options a discuter
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    columns = st.columns(2)
+    for column, card in zip(columns, cards):
+        with column:
+            _render_patient_scenario_card(card)
+
+    st.markdown("<div style='height: 1.25rem;'></div>", unsafe_allow_html=True)
+
+
+def _build_patient_scenario_cards(result: DecisionResult) -> list[dict[str, Any]]:
+    surgery_badge = _patient_option_badge(result, "surgery")
+    watch_badge = _patient_option_badge(result, "watch_and_wait")
+
+    surgery_card = {
+        "eyebrow": "Option 1",
+        "title": "Operation",
+        "accent": "#0066FF",
+        "badge": surgery_badge,
+        "summary": "On retire la zone qui reste pour essayer de securiser au maximum la situation.",
+        "points": [
+            f"Point fort: environ {_format_people_ratio(result.surgery_outcome.dfs_5_years)} evitent un retour de la maladie a 5 ans.",
+            f"Complication importante possible chez environ {_format_people_ratio(result.surgery_outcome.major_complication_risk)}.",
+            f"Troubles digestifs durables possibles chez environ {_format_people_ratio(result.surgery_outcome.lars_risk)}.",
+            f"Une stomie (poche) peut etre necessaire chez environ {_format_people_ratio(result.surgery_outcome.stoma_risk)}.",
+        ],
+    }
+
+    watch_card = {
+        "eyebrow": "Option 2",
+        "title": "Surveillance rapprochee",
+        "accent": "#00A67E",
+        "badge": watch_badge,
+        "summary": "On n'opere pas tout de suite, mais on controle tres regulierement pour verifier que tout reste stable.",
+        "points": [
+            "Point fort: cela peut permettre d'eviter l'operation et ses effets secondaires.",
+            f"La maladie peut revenir au meme endroit chez environ {_format_people_ratio(result.ww_outcome.regrowth_risk)}.",
+            f"Une operation plus tard peut devenir necessaire chez environ {_format_people_ratio(result.ww_outcome.salvage_surgery_risk)}.",
+            "Cette option oblige a faire des controles frequents pendant plusieurs annees.",
+        ],
+    }
+
+    return [surgery_card, watch_card]
+
+
+def _patient_option_badge(result: DecisionResult, option: str) -> str:
+    if result.recommended_scenario == "uncertain":
+        return "Option possible"
+    if result.recommended_scenario == option:
+        return "Option plutot privilegiee"
+    return "Option encore possible"
+
+
+def _render_patient_scenario_card(card: dict[str, Any]) -> None:
+    points_html = "".join(
+        f'<li style="margin: 0 0 0.42rem; color: #1A1D21;">{html.escape(str(point))}</li>'
+        for point in card["points"]
+    )
+    st.markdown(
+        f"""
+        <div style="
+            background: #FFFFFF;
+            border: 1px solid #D9E2EC;
+            border-top: 4px solid {card['accent']};
+            border-radius: 16px;
+            padding: 1rem 1.1rem 1rem;
+            min-height: 275px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.8rem;">
+                <div>
+                    <p style="
+                        margin: 0 0 0.18rem;
+                        color: #5E6C84;
+                        font-size: 0.72rem;
+                        font-weight: 700;
+                        letter-spacing: 0.08em;
+                        text-transform: uppercase;
+                    ">
+                        {html.escape(str(card['eyebrow']))}
+                    </p>
+                    <h4 style="margin: 0; color: #102A43; font-size: 1.02rem; font-weight: 700;">
+                        {html.escape(str(card['title']))}
+                    </h4>
+                </div>
+                <span style="
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 0.28rem 0.6rem;
+                    border-radius: 999px;
+                    background: color-mix(in srgb, {card['accent']} 10%, white);
+                    color: {card['accent']};
+                    font-size: 0.74rem;
+                    font-weight: 700;
+                    white-space: nowrap;
+                ">
+                    {html.escape(str(card['badge']))}
+                </span>
+            </div>
+            <p style="margin: 0 0 0.85rem; color: #243B53; font-size: 0.93rem; line-height: 1.55;">
+                {html.escape(str(card['summary']))}
+            </p>
+            <ul style="margin: 0; padding-left: 1.1rem; font-size: 0.9rem; line-height: 1.55;">
+                {points_html}
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _format_people_ratio(value: float) -> str:
+    rounded = max(0, min(100, int(round(float(value)))))
+    return f"{rounded} personnes sur 100"
 
 
 
@@ -262,6 +535,10 @@ def _render_surgery_panel(result: DecisionResult) -> None:
         st.markdown(f"**Complication majeure:** {outcome.major_complication_risk:.1f}%")
         st.markdown(f"**Stomie permanente:** {outcome.stoma_risk:.1f}%")
         st.markdown(f"**LARS majeur:** {outcome.lars_risk:.1f}%")
+        if result.rationale.surgery_risks:
+            st.markdown("**Complications prevues (detail):**")
+            for line in result.rationale.surgery_risks[:8]:
+                st.markdown(f"- {line}")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -339,6 +616,10 @@ def _render_ww_panel(result: DecisionResult) -> None:
         st.markdown(f"**Chirurgie de sauvetage:** {outcome.salvage_surgery_risk:.1f}%")
         st.markdown(f"**Recidive locale:** {outcome.local_recurrence_risk:.1f}%")
         st.markdown(f"**Metastase:** {outcome.distant_metastasis_risk:.1f}%")
+        if result.rationale.ww_risks:
+            st.markdown("**Complications prevues (detail):**")
+            for line in result.rationale.ww_risks[:8]:
+                st.markdown(f"- {line}")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -485,7 +766,7 @@ def _render_comparison_table(result: DecisionResult) -> None:
 def _render_whatif_section(result: DecisionResult) -> None:
     """Render What-If mode for exploring different parameters (e.g., surgical delay)."""
     st.markdown('<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #E4E7EB;"></div>', unsafe_allow_html=True)
-    _render_section_header("Mode What-If", "Exploration des alternatives cliniques")
+    _render_section_header("Mode Scenarios", "Exploration des alternatives cliniques")
 
     st.markdown("Testez l'impact d'un allongement du delai post-RCT (donnees GRECCAR 6) :")
 

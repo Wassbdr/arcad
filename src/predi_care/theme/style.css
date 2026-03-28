@@ -631,3 +631,26 @@ hr {
   color: var(--text-secondary);
   min-width: 80px;
 }
+
+/* Visual polish: same UX, cleaner rendering */
+div[data-testid="stMetric"] {
+  border: 1px solid #E4EAF2;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%);
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
+}
+
+div[data-testid="stExpander"] > details > summary {
+  background: linear-gradient(90deg, #F6FAFF 0%, #FFFFFF 100%);
+  border-bottom: 1px solid #E5EBF3;
+}
+
+div[data-testid="stAlert"] {
+  border-radius: 12px;
+  border: 1px solid #E5EBF3;
+}
+
+div[data-testid="stDataFrame"] {
+  border: 1px solid #E5EBF3;
+  border-radius: 12px;
+  overflow: hidden;
+}
