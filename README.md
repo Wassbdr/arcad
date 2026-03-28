@@ -16,59 +16,57 @@ Toute decision clinique reelle doit etre validee par des professionnels qualifie
 
 ## Fonctionnalites
 
-- Architecture Multi-Agent:
-  - Agent Radiologue: interprete cTNM, residu tumoral, qualite d'imagerie
-  - Agent Biologiste: analyse la cinetique ACE
-  - Agent Coordinateur: fusionne les signaux multimodaux et genere une recommandation
-    - regles explicites ACE/TNM/residu tumoral
-    - gestion des conflits inter-agents et niveau d'incertitude
-- Moteur de risque:
-  - simulation de probabilite de recidive
-  - comparaison des risques par scenario
-- UX "Medical Minimalist":
-  - header clinique moderne
-  - sidebar de saisie structuree
-  - deux cartes de decision cote a cote
-- Visualisation interactive (Plotly):
-  - courbes de survie sans recidive
-  - bar chart de comparaison des risques
-- XAI (explicabilite):
-  - visualisations de type SHAP Force et SHAP Summary (mode simule)
-- Mode Discussion:
-  - chat "Expert IA" sur la recommandation
-- Export:
-  - generation d'un resume PDF patient
-- Donnees de test:
-  - generateur de patients virtuels et cohortes mock
+- Pipeline unique v2:
+  - une seule application Streamlit: app_v2
+  - un seul moteur de decision: BrainEngineV2
+  - fallback heuristique automatique si le LLM n'est pas disponible
+- Simulation comparee des strategies:
+  - chirurgie
+  - watch and wait
+- Mode cohorte:
+  - import CSV robuste (validation + avertissements)
+  - simulation batch
+  - filtres/tri tableau
+  - export CSV enrichi avec synthese par sous-cohorte
+  - export PDF cohorte pagine par sous-cohorte
+- Visualisations premium (Plotly):
+  - Kaplan-Meier compare
+  - comparaison des risques
+  - explicabilite de type SHAP
+- Export patient:
+  - rapport PDF decisionnel individuel
 
 ## Architecture
 
 Pipeline principal:
 1. Saisie des variables cliniques dans la sidebar
-2. Agent Radiologue -> score de risque local et confiance
-3. Agent Biologiste -> score biologique et dynamique ACE
-4. Agent Coordinateur -> probabilite de recidive + comparaison des scenarios
+2. Mapping des entrees vers format CRF
+3. Appel LLM medical (si configure)
+4. Fallback heuristique CRFSimulator si indisponible
 5. Rendu UI:
-   - Decision Cards
-   - graphiques de survie
-   - explicabilite XAI
-   - chat expert
-   - export PDF
+  - comparaison des scenarios
+  - graphiques de survie/risques
+  - explicabilite
+  - export PDF patient/cohorte
 
 ## Structure du projet
 
 Architecture reorganisee (modulaire):
 
 - app.py: point d'entree Streamlit
-- src/predi_care/app_shell.py: orchestration UI complete
-- src/predi_care/engine/brain_engine.py: logique multi-agent et fusion
+- src/predi_care/app_v2.py: orchestration UI unique
+- src/predi_care/engine/brain_engine_v2.py: moteur de decision canonique
+- src/predi_care/engine/patient_types.py: schema patient partage
+- src/predi_care/engine/crf_mapper.py: mapping vers variables CRF
+- src/predi_care/engine/crf_simulator.py: moteur heuristique de fallback
+- src/predi_care/engine/llm_client.py: integration LLM medical
 - src/predi_care/engine/mock_factory.py: generation de donnees de test
-- src/predi_care/ui/visuals.py: visualisations Plotly + SHAP-style
-- src/predi_care/chat/llm_chat.py: facade chat expert (simule/API)
+- src/predi_care/ui/comparative_ui.py: rendu compare des scenarios
+- src/predi_care/ui/visuals_v2.py: visualisations Plotly v2
+- src/predi_care/export/pdf_report.py: export PDF patient + cohorte
 - src/predi_care/theme/style.css: theme medical premium
 - docs/references/MEDICAL_LOGIC_REF.md: reference medico-logique
 - docs/references/DESIGN_SYSTEM.md: charte UI/UX
-- docs/CALIBRATION_PLAYBOOK.md: guide complet de calibration
 - docs/VULGARISATION_IA_NON_TECH.md: explication complete pour profils non-tech IA
 - docs/VULGARISATION_MEDECINE_NON_TECH.md: explication complete pour profils non-tech medical
 - config/calibration_profile.template.yaml: profil de calibration a personnaliser
@@ -123,7 +121,7 @@ Puis ouvrir:
    - residus tumoraux IRM
    - qualite imagerie
    - age, ECOG
-2. Cliquer sur "Lancer Evaluation IA"
+2. Cliquer sur "Simuler"
 3. Analyser les deux cartes de decision:
    - risque de recidive
    - confiance du modele
@@ -131,50 +129,21 @@ Puis ouvrir:
 4. Examiner les graphiques:
    - survie sans recidive par scenario
    - comparaison globale des risques
-5. Interroger le module "Mode Discussion | Expert IA"
-6. Exporter la synthese via "Exporter le resume PDF"
+5. Exporter la synthese patient via "Telecharger Rapport PDF"
+6. (Optionnel) Utiliser le mode cohorte pour import CSV et exports batch
 
 ## Details techniques
 
-### Agent Radiologue
-Entrées principales:
-- cT, cN, cM
-- ratio de residu tumoral
-- qualite d'imagerie
+### BrainEngineV2
+- entree unique: PatientInput
+- conversion des donnees cliniques vers CRFInput
+- tentative d'inference via LLM medical
+- fallback heuristique sur CRFSimulator en cas d'echec
 
-Sorties:
-- local_recurrence_risk
-- radiology_confidence
-- resume radiologique
-
-### Agent Biologiste
-Entrées principales:
-- ACE baseline
-- ACE actuel
-
-Sorties:
-- bio_risk
-- pourcentage de baisse ACE
-- resume biologique
-
-### Agent Coordinateur
-Fusion des sorties agents + facteurs cliniques (age, ECOG) pour produire:
-- probabilite globale de recidive
-- recommandation finale
-- rationale textuelle
-- score d'incertitude (Faible/Moyenne/Elevee)
-- detection de conflits de donnees et motifs associes
-- alertes cliniques (ACE, TNM, residu tumoral)
-- simulation des scenarios:
-  - risque chirurgie
-  - risque watch and wait
-  - impact qualite de vie
-- contributions explicatives type SHAP-like
-
-### Module Chat Expert
-- Service dedie dans src/predi_care/chat/llm_chat.py
-- Mode actuel: simulated
-- Extension prevue: branchement API LLM (mode api)
+### Simulation et sortie
+- comparaison chirurgie vs watch and wait
+- metriques DFS, risques, qualite de vie, confiance
+- rationale exploitable par l'UI et les exports
 
 ## XAI et SHAP
 
@@ -198,10 +167,10 @@ Le rendu visuel est centralise dans src/predi_care/theme/style.css:
 
 ## Limitations actuelles
 
-- Scores et coefficients heuristiques (prototype)
-- SHAP simule (non issu d'un modele entraine)
-- Chat base sur une logique reglee par regles
-- Export PDF minimaliste (sans template clinique officiel)
+- Scores heuristiques en mode fallback
+- Dependance a la qualite des donnees saisies/importees
+- SHAP de type explicatif (pas un audit causal complet)
+- Export PDF orienté demo (pas de template hospitalier officiel)
 
 ## Roadmap recommandee
 

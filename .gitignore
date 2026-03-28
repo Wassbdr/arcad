@@ -24,3 +24,4 @@ dist/
 # Data exports
 data/exports/*
 !data/exports/.gitkeep
+.streamlit/secrets.toml

@@ -1,0 +1,455 @@
+{
+  "study": "GRECCAR9",
+  "file": "GRECCAR9_eCRF_14122023_v5.pdf",
+  "n_pages": 73,
+  "sections": [
+    {
+      "page": 1,
+      "text": "après résection abdomino-périnéale pour adénocarcinome ano-rectal"
+    },
+    {
+      "page": 32,
+      "text": "Les évaluations de la douleur et les traitements pris doivent être synthétisés dans la section « Syn"
+    },
+    {
+      "page": 41,
+      "text": "Les évaluations de la douleur et les traitements pris doivent être synthétisés dans la section « Syn"
+    },
+    {
+      "page": 50,
+      "text": "Les évaluations de la douleur et les traitements pris doivent être synthétisés dans la section « Syn"
+    }
+  ],
+  "variables_found": [
+    {
+      "page": 1,
+      "keyword": "CT",
+      "context": "Electronic Case Report Form"
+    },
+    {
+      "page": 2,
+      "keyword": "CT",
+      "context": "Poids actuel |__|__|__|.|__] kg"
+    },
+    {
+      "page": 2,
+      "keyword": "CM",
+      "context": "Taille |__|__|__| cm"
+    },
+    {
+      "page": 2,
+      "keyword": "ACE",
+      "context": "<Menu déroulant> capable de se déplacer seul et d'assurer un travail léger ou sédentaire)"
+    },
+    {
+      "page": 2,
+      "keyword": "SEXE",
+      "context": "Sexe  Féminin  Masculin"
+    },
+    {
+      "page": 3,
+      "keyword": "CT",
+      "context": "Antécédents familiaux de cancers colorectaux  Oui  Non  Ne sait pas"
+    },
+    {
+      "page": 4,
+      "keyword": "STADE",
+      "context": "Stade T  T1  T2  T3  T4a  T4b"
+    },
+    {
+      "page": 4,
+      "keyword": "CT",
+      "context": "- au bord supérieur de l’appareil sphinctérien"
+    },
+    {
+      "page": 4,
+      "keyword": "IRM",
+      "context": "IRM PELVIENNE"
+    },
+    {
+      "page": 4,
+      "keyword": "TUMORAL",
+      "context": "Localisation tumorale par rapport :"
+    },
+    {
+      "page": 7,
+      "keyword": "ACE",
+      "context": "ACE  Fait  Non fait"
+    },
+    {
+      "page": 7,
+      "keyword": "MARQUEUR",
+      "context": "MARQUEURS TUMORAUX"
+    },
+    {
+      "page": 8,
+      "keyword": "STADE",
+      "context": "2 ECOG performance status : stades 0 à 2  Oui  Non"
+    },
+    {
+      "page": 8,
+      "keyword": "CT",
+      "context": "3 Patient porteur d’un adénocarcinome rectal ou un carcinome"
+    },
+    {
+      "page": 8,
+      "keyword": "ECOG",
+      "context": "2 ECOG performance status : stades 0 à 2  Oui  Non"
+    },
+    {
+      "page": 8,
+      "keyword": "PERFORMANCE",
+      "context": "2 ECOG performance status : stades 0 à 2  Oui  Non"
+    },
+    {
+      "page": 9,
+      "keyword": "CM",
+      "context": "|__|__| cm"
+    },
+    {
+      "page": 9,
+      "keyword": "IRM",
+      "context": "Confirmation de l’absence de grossesse"
+    },
+    {
+      "page": 10,
+      "keyword": "CT",
+      "context": "professionnelle appartenez- 3 - Cadres et professions intellectuelles"
+    },
+    {
+      "page": 10,
+      "keyword": "AGE",
+      "context": "2 Chômage"
+    },
+    {
+      "page": 11,
+      "keyword": "CT",
+      "context": "ACTIVITES COURANTES (P. EX., TRAVAIL, ETUDES, TRAVAUX DOMESTIQUES,"
+    },
+    {
+      "page": 11,
+      "keyword": "ACE",
+      "context": "Je n’ai aucun problème pour me déplacer à pied"
+    },
+    {
+      "page": 13,
+      "keyword": "AGE",
+      "context": "Ces informations doivent être renseignées dans le fichier de cryptage fourni par l’UEME. Ce fichier sera"
+    },
+    {
+      "page": 14,
+      "keyword": "CT",
+      "context": "randomisation section ‘Radiothérapie pré-opératoire’ page X."
+    },
+    {
+      "page": 14,
+      "keyword": "AGE",
+      "context": "randomisation section ‘Radiothérapie pré-opératoire’ page X."
+    },
+    {
+      "page": 15,
+      "keyword": "CT",
+      "context": "Groupe de traitement: Reconstruction périnéale par prothèse biologique / Fermeture"
+    },
+    {
+      "page": 16,
+      "keyword": "CT",
+      "context": " Défect pariétal périnéal important nécessitant un"
+    },
+    {
+      "page": 17,
+      "keyword": "CT",
+      "context": " Intersphinctérienne"
+    },
+    {
+      "page": 17,
+      "keyword": "CM",
+      "context": "Taille de la fermeture |__|__|.|__| cm"
+    },
+    {
+      "page": 17,
+      "keyword": "AGE",
+      "context": "Drainage pelvien  Oui  Non"
+    },
+    {
+      "page": 18,
+      "keyword": "CT",
+      "context": "Longueur de la résection |__|__| cm"
+    },
+    {
+      "page": 18,
+      "keyword": "CM",
+      "context": "Longueur de la résection |__|__| cm"
+    },
+    {
+      "page": 18,
+      "keyword": "AGE",
+      "context": "Pourcentage d’envahissement de la"
+    },
+    {
+      "page": 18,
+      "keyword": "TUMORAL",
+      "context": "Taille tumorale :"
+    },
+    {
+      "page": 19,
+      "keyword": "CT",
+      "context": " Mésorectum ou sous-séreuse"
+    },
+    {
+      "page": 19,
+      "keyword": "ACE",
+      "context": " Organes adjacents"
+    },
+    {
+      "page": 19,
+      "keyword": "TUMORAL",
+      "context": "Niveau d’infiltation tumorale  Pas de tumeur"
+    },
+    {
+      "page": 21,
+      "keyword": "CM",
+      "context": "|__|__| cm"
+    },
+    {
+      "page": 22,
+      "keyword": "AGE",
+      "context": "Pour plus de pages, veuillez cocher la case "
+    },
+    {
+      "page": 23,
+      "keyword": "CT",
+      "context": "Collection intra abdominale  Oui  Non"
+    },
+    {
+      "page": 23,
+      "keyword": "IRM",
+      "context": "Des soins infirmiers sont-ils nécessaires  Oui  Non"
+    },
+    {
+      "page": 25,
+      "keyword": "CT",
+      "context": "Poids actuel |__|__|__|.|__] kg"
+    },
+    {
+      "page": 25,
+      "keyword": "CM",
+      "context": "|__|__| cm"
+    },
+    {
+      "page": 25,
+      "keyword": "ACE",
+      "context": "|__| capable de se déplacer seul et d'assurer un travail léger ou sédentaire)"
+    },
+    {
+      "page": 27,
+      "keyword": "AGE",
+      "context": "Pour plus de pages, veuillez cocher la case "
+    },
+    {
+      "page": 28,
+      "keyword": "CT",
+      "context": "5 - Présence d’infection sévère avec ou sans la présence de séparation"
+    },
+    {
+      "page": 28,
+      "keyword": "IRM",
+      "context": "Des soins infirmiers sont-ils nécessaires  Oui  Non"
+    },
+    {
+      "page": 29,
+      "keyword": "CT",
+      "context": "ACTIVITES COURANTES (P. EX., TRAVAIL, ETUDES, TRAVAUX DOMESTIQUES,"
+    },
+    {
+      "page": 29,
+      "keyword": "ACE",
+      "context": "Je n’ai aucun problème pour me déplacer à pied"
+    },
+    {
+      "page": 31,
+      "keyword": "CT",
+      "context": "PERTE DE PRODUCTIVITE DEPUIS LA DERNIERE VISITE"
+    },
+    {
+      "page": 31,
+      "keyword": "AGE",
+      "context": "2 Chômage"
+    },
+    {
+      "page": 32,
+      "keyword": "CT",
+      "context": "Les évaluations de la douleur et les traitements pris doivent être synthétisés dans la section « Synthèse"
+    },
+    {
+      "page": 33,
+      "keyword": "CT",
+      "context": "Poids actuel |__|__|__|.|__] kg"
+    },
+    {
+      "page": 33,
+      "keyword": "CM",
+      "context": "|__|__| cm"
+    },
+    {
+      "page": 33,
+      "keyword": "ACE",
+      "context": "|__| capable de se déplacer seul et d'assurer un travail léger ou sédentaire)"
+    },
+    {
+      "page": 35,
+      "keyword": "AGE",
+      "context": "Pour plus de pages, veuillez cocher la case "
+    },
+    {
+      "page": 36,
+      "keyword": "CT",
+      "context": "5 - Présence d’infection sévère avec ou sans la présence de séparation"
+    },
+    {
+      "page": 36,
+      "keyword": "IRM",
+      "context": "Des soins infirmiers sont-ils nécessaires  Oui  Non"
+    },
+    {
+      "page": 37,
+      "keyword": "CT",
+      "context": "ACTIVITES COURANTES (P. EX., TRAVAIL, ETUDES, TRAVAUX DOMESTIQUES,"
+    },
+    {
+      "page": 37,
+      "keyword": "ACE",
+      "context": "Je n’ai aucun problème pour me déplacer à pied"
+    },
+    {
+      "page": 39,
+      "keyword": "CT",
+      "context": "PERTE DE PRODUCTIVITE"
+    },
+    {
+      "page": 39,
+      "keyword": "AGE",
+      "context": "2 Chômage"
+    },
+    {
+      "page": 40,
+      "keyword": "ACE",
+      "context": "ACE  Fait  Non fait"
+    },
+    {
+      "page": 40,
+      "keyword": "MARQUEUR",
+      "context": "MARQUEURS TUMORAUX"
+    },
+    {
+      "page": 40,
+      "keyword": "AGE",
+      "context": "page TRAITEMENT TUMORAL POST-CHIRURGICAL."
+    },
+    {
+      "page": 40,
+      "keyword": "IRM",
+      "context": "IRM PELVIENNE"
+    },
+    {
+      "page": 40,
+      "keyword": "TUMORAL",
+      "context": "EVALUATION TUMORALE"
+    },
+    {
+      "page": 40,
+      "keyword": "RECIDIVE",
+      "context": "EVALUATION DE LA RECIDIVE"
+    },
+    {
+      "page": 41,
+      "keyword": "CT",
+      "context": "Les évaluations de la douleur et les traitements pris doivent être synthétisés dans la section « Synthèse"
+    },
+    {
+      "page": 42,
+      "keyword": "CT",
+      "context": "Poids actuel |__|__|__|.|__] kg"
+    },
+    {
+      "page": 42,
+      "keyword": "CM",
+      "context": "|__|__| cm"
+    },
+    {
+      "page": 42,
+      "keyword": "ACE",
+      "context": "|__| capable de se déplacer seul et d'assurer un travail léger ou sédentaire)"
+    },
+    {
+      "page": 44,
+      "keyword": "AGE",
+      "context": "Pour plus de pages, veuillez cocher la case "
+    },
+    {
+      "page": 45,
+      "keyword": "CT",
+      "context": "5 - Présence d’infection sévère avec ou sans la présence de séparation"
+    },
+    {
+      "page": 45,
+      "keyword": "IRM",
+      "context": "Des soins infirmiers sont-ils nécessaires  Oui  Non"
+    },
+    {
+      "page": 46,
+      "keyword": "CT",
+      "context": "ACTIVITES COURANTES (P. EX., TRAVAIL, ETUDES, TRAVAUX DOMESTIQUES,"
+    },
+    {
+      "page": 46,
+      "keyword": "ACE",
+      "context": "Je n’ai aucun problème pour me déplacer à pied"
+    },
+    {
+      "page": 48,
+      "keyword": "CT",
+      "context": "PERTE DE PRODUCTIVITE"
+    },
+    {
+      "page": 48,
+      "keyword": "AGE",
+      "context": "2 Chômage"
+    },
+    {
+      "page": 49,
+      "keyword": "ACE",
+      "context": "ACE  Fait  Non fait"
+    },
+    {
+      "page": 49,
+      "keyword": "MARQUEUR",
+      "context": "MARQUEURS TUMORAUX"
+    },
+    {
+      "page": 49,
+      "keyword": "AGE",
+      "context": "page TRAITEMENT TUMORAL POST-CHIRURGICAL."
+    },
+    {
+      "page": 49,
+      "keyword": "IRM",
+      "context": "IRM PELVIENNE"
+    },
+    {
+      "page": 49,
+      "keyword": "TUMORAL",
+      "context": "Si oui, statut tumoral  Rémission"
+    },
+    {
+      "page": 49,
+      "keyword": "RECIDIVE",
+      "context": "EVALUATION DE LA RECIDIVE"
+    },
+    {
+      "page": 50,
+      "keyword": "CT",
+      "context": "Les évaluations de la douleur et les traitements pris doivent être synthétisés dans la section « Synthèse"
+    }
+  ]
+}

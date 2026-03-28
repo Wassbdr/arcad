@@ -1,34 +1,66 @@
-from predi_care.ui.visuals import (
-    build_risk_comparison,
-    build_shap_force_like,
-    build_shap_summary_like,
-    build_survival_curve,
+from predi_care.ui.visuals_v2 import (
+    build_confidence_gauge,
+    build_kaplan_meier_comparison,
+    build_qol_comparison,
+    build_risk_category_comparison,
+    build_shap_explainability,
 )
 
 
-def test_survival_curve_returns_figure() -> None:
-    fig = build_survival_curve("test", 0.25)
+def test_kaplan_meier_comparison_returns_two_curves() -> None:
+    fig = build_kaplan_meier_comparison(
+        {
+            "months": [1, 3, 6, 12, 24, 36, 60],
+            "surgery_dfs": [98.0, 96.0, 94.0, 91.0, 86.0, 84.0, 82.0],
+            "ww_dfs": [95.0, 90.0, 82.0, 76.0, 72.0, 70.0, 68.0],
+            "surgery_label": "Chirurgie",
+            "ww_label": "Watch & Wait",
+        }
+    )
     assert fig is not None
-    assert len(list(fig.data)) > 0
+    assert len(list(fig.data)) == 2
 
 
-def test_risk_comparison_returns_two_bars() -> None:
-    fig = build_risk_comparison(0.2, 0.35)
+def test_risk_category_comparison_returns_grouped_bars() -> None:
+    fig = build_risk_category_comparison(
+        {
+            "surgery": {
+                "local_recurrence": 8.0,
+                "distant_metastasis": 14.0,
+                "major_complication": 19.0,
+            },
+            "watch_and_wait": {
+                "local_recurrence": 12.0,
+                "distant_metastasis": 11.0,
+                "regrowth": 26.0,
+            },
+        }
+    )
+    assert len(list(fig.data)) == 2
+
+
+def test_shap_explainability_accepts_feature_contributions() -> None:
+    fig = build_shap_explainability(
+        {
+            "feature_contributions": {
+                "TRG Score": 22.5,
+                "ycT Stage": -14.0,
+                "ACE Normalization": 6.0,
+            }
+        }
+    )
+    assert fig is not None
     assert len(list(fig.data)) == 1
-    x_values = list(fig.data[0]["x"])
-    assert len(x_values) == 2
 
 
-def test_shap_force_like_accepts_dict() -> None:
-    shap_data = {"cT": 0.11, "ACE": -0.08, "Residu": 0.05}
-    fig = build_shap_force_like(shap_data)
+def test_qol_comparison_renders_two_categories() -> None:
+    fig = build_qol_comparison(68.0, 84.0)
     assert fig is not None
+    assert len(list(fig.data)) == 1
+    assert len(list(fig.data[0]["x"])) == 2
 
 
-def test_shap_summary_like_accepts_list() -> None:
-    sample = [
-        {"cT": 0.1, "ACE": -0.05, "Residu": 0.04},
-        {"cT": 0.08, "ACE": -0.06, "Residu": 0.03},
-    ]
-    fig = build_shap_summary_like(sample)
+def test_confidence_gauge_returns_indicator() -> None:
+    fig = build_confidence_gauge(76.0, "high")
     assert fig is not None
+    assert len(list(fig.data)) == 1

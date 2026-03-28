@@ -1,0 +1,1173 @@
+{
+  "study": "GRECCAR12",
+  "file": "GRECCAR12-CO-v9.0-20220707_Suivi Vital et Oncologique au 09.06.2022.pdf",
+  "n_pages": 72,
+  "sections": [],
+  "variables_found": [
+    {
+      "page": 1,
+      "keyword": "CT",
+      "context": "le cancer du rectum :"
+    },
+    {
+      "page": 2,
+      "keyword": "CT",
+      "context": "Unité Colorectale FRANCE"
+    },
+    {
+      "page": 2,
+      "keyword": "AGE",
+      "context": "Centre médico-chirurgical Magellan"
+    },
+    {
+      "page": 3,
+      "keyword": "CT",
+      "context": "ne pourront être saisies par l’atelier de dactylocodage. En cas de modification du nombre"
+    },
+    {
+      "page": 3,
+      "keyword": "ACE",
+      "context": "rester visible) et réécrite lisiblement en dessous (ou à coté selon l’espace disponible), puis datée"
+    },
+    {
+      "page": 3,
+      "keyword": "AGE",
+      "context": "REMPLISSAGE"
+    },
+    {
+      "page": 4,
+      "keyword": "CT",
+      "context": "folfirinox et la si tumorectomie"
+    },
+    {
+      "page": 4,
+      "keyword": "MARQUEUR",
+      "context": "NFS, Plaquette, TP, Bilan biochimique, Marqueurs tumoraux"
+    },
+    {
+      "page": 4,
+      "keyword": "ECOG",
+      "context": "1Examen Clinique : antécédents thérapeutiques, médicaux et chirurgicaux, comorbidité et traitements, poids, taille, stat"
+    },
+    {
+      "page": 4,
+      "keyword": "PERFORMANCE",
+      "context": "1Examen Clinique : antécédents thérapeutiques, médicaux et chirurgicaux, comorbidité et traitements, poids, taille, stat"
+    },
+    {
+      "page": 4,
+      "keyword": "IRM",
+      "context": "IRM Pelvienne X si bras A, entre le X X (optionnelle)"
+    },
+    {
+      "page": 4,
+      "keyword": "ECHO",
+      "context": "Echoendoscopie rectale"
+    },
+    {
+      "page": 4,
+      "keyword": "ENDOSCOPIE",
+      "context": "Echoendoscopie rectale"
+    },
+    {
+      "page": 4,
+      "keyword": "TUMORAL",
+      "context": "Bras A ou B tumorale"
+    },
+    {
+      "page": 5,
+      "keyword": "CT",
+      "context": "Adénocarcinome rectal confirmé histologiquement :  oui  non"
+    },
+    {
+      "page": 5,
+      "keyword": "CM",
+      "context": "Poids (kg) Taille (cm)"
+    },
+    {
+      "page": 5,
+      "keyword": "AGE",
+      "context": "Page 5/56"
+    },
+    {
+      "page": 5,
+      "keyword": "SEXE",
+      "context": "Sexe  masculin  féminin"
+    },
+    {
+      "page": 5,
+      "keyword": "ECOG",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 5,
+      "keyword": "PERFORMANCE",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 5,
+      "keyword": "IRM",
+      "context": "Adénocarcinome rectal confirmé histologiquement :  oui  non"
+    },
+    {
+      "page": 6,
+      "keyword": "STADE",
+      "context": "Stade T  T0  T1  T2  T3a  T3b  T3  T3d  T4"
+    },
+    {
+      "page": 6,
+      "keyword": "CT",
+      "context": "◼ à la pré-inclusion  relecture bordelaise à la pré-inclusion"
+    },
+    {
+      "page": 6,
+      "keyword": "ACE",
+      "context": "Organe adjacent"
+    },
+    {
+      "page": 6,
+      "keyword": "AGE",
+      "context": "Page 6/56"
+    },
+    {
+      "page": 6,
+      "keyword": "IRM",
+      "context": "Fiche IRM"
+    },
+    {
+      "page": 6,
+      "keyword": "TUMORAL",
+      "context": "Taille tumorale (plus grand diamètre) (mm)"
+    },
+    {
+      "page": 7,
+      "keyword": "STADE",
+      "context": "Stade T  T0  T1  T2  T3a  T3b  T3  T3d  T4"
+    },
+    {
+      "page": 7,
+      "keyword": "CT",
+      "context": " à la pré-inclusion ◼ relecture bordelaise à la pré-inclusion"
+    },
+    {
+      "page": 7,
+      "keyword": "ACE",
+      "context": "Organe adjacent"
+    },
+    {
+      "page": 7,
+      "keyword": "AGE",
+      "context": "Page 7/56"
+    },
+    {
+      "page": 7,
+      "keyword": "IRM",
+      "context": "Fiche IRM"
+    },
+    {
+      "page": 7,
+      "keyword": "TUMORAL",
+      "context": "Taille tumorale (plus grand diamètre) (mm)"
+    },
+    {
+      "page": 8,
+      "keyword": "ACE",
+      "context": "ACE (ng/ml)"
+    },
+    {
+      "page": 8,
+      "keyword": "AGE",
+      "context": "Page 8/56"
+    },
+    {
+      "page": 9,
+      "keyword": "CT",
+      "context": "1. Adénocarcinome de rectum prouvé histologiquement 1❑ 0◼ └─┘"
+    },
+    {
+      "page": 9,
+      "keyword": "CM",
+      "context": "4. Taille tumorale ≤ 4 cm (à l’IRM) 1❑ 0◼ └─┘"
+    },
+    {
+      "page": 9,
+      "keyword": "ACE",
+      "context": "14. Contraception efficace pour les patients en âge de procréer : les patients de"
+    },
+    {
+      "page": 9,
+      "keyword": "AGE",
+      "context": "Page 9/56"
+    },
+    {
+      "page": 9,
+      "keyword": "SEXE",
+      "context": "sexe masculin et les femmes non ménopausées doivent accepter d’utiliser deux"
+    },
+    {
+      "page": 9,
+      "keyword": "ECOG",
+      "context": "18. Index de performance ECOG  2 (annexe 1 du protocole) 1❑ 0◼ └─┘"
+    },
+    {
+      "page": 9,
+      "keyword": "PERFORMANCE",
+      "context": "18. Index de performance ECOG  2 (annexe 1 du protocole) 1❑ 0◼ └─┘"
+    },
+    {
+      "page": 9,
+      "keyword": "IRM",
+      "context": "4. Taille tumorale ≤ 4 cm (à l’IRM) 1❑ 0◼ └─┘"
+    },
+    {
+      "page": 9,
+      "keyword": "TUMORAL",
+      "context": "4. Taille tumorale ≤ 4 cm (à l’IRM) 1❑ 0◼ └─┘"
+    },
+    {
+      "page": 10,
+      "keyword": "CT",
+      "context": "3. Sphincter externe ou releveurs de l’anus envahis 1◼ 0❑ └─┘"
+    },
+    {
+      "page": 10,
+      "keyword": "CM",
+      "context": "2. Taille tumorale > 4 cm 1◼ 0❑ └─┘"
+    },
+    {
+      "page": 10,
+      "keyword": "ACE",
+      "context": "18. Infection évolutive active ou autre pathologie grave sous-jacente susceptible"
+    },
+    {
+      "page": 10,
+      "keyword": "AGE",
+      "context": "Page 10/56"
+    },
+    {
+      "page": 10,
+      "keyword": "TUMORAL",
+      "context": "2. Taille tumorale > 4 cm 1◼ 0❑ └─┘"
+    },
+    {
+      "page": 11,
+      "keyword": "CT",
+      "context": "• Connectez-vous au site Internet http://usmr.isped.u-bordeaux2.fr pour l’enregistrement"
+    },
+    {
+      "page": 11,
+      "keyword": "AGE",
+      "context": "Page 11/56"
+    },
+    {
+      "page": 11,
+      "keyword": "IRM",
+      "context": "• Compléter la page web « randomisation » après avoir préalablement confirmé tous les"
+    },
+    {
+      "page": 12,
+      "keyword": "CT",
+      "context": "Fiche CT INDUCTION"
+    },
+    {
+      "page": 12,
+      "keyword": "AGE",
+      "context": "Page 12/56"
+    },
+    {
+      "page": 12,
+      "keyword": "ECOG",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 12,
+      "keyword": "PERFORMANCE",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 13,
+      "keyword": "CT",
+      "context": "Cycle: ◼ C1 CT induction  C2 CT induction  C3 CT induction  C4 CT induction  RTCT"
+    },
+    {
+      "page": 13,
+      "keyword": "AGE",
+      "context": "Page 13/56"
+    },
+    {
+      "page": 14,
+      "keyword": "CT",
+      "context": "Fiche CT INDUCTION"
+    },
+    {
+      "page": 14,
+      "keyword": "AGE",
+      "context": "Page 14/56"
+    },
+    {
+      "page": 14,
+      "keyword": "ECOG",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 14,
+      "keyword": "PERFORMANCE",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 15,
+      "keyword": "CT",
+      "context": "Cycle:  C1 CT induction ◼ C2 CT induction  C3 CT induction  C4 CT induction  RTCT"
+    },
+    {
+      "page": 15,
+      "keyword": "AGE",
+      "context": "Page 15/56"
+    },
+    {
+      "page": 16,
+      "keyword": "CT",
+      "context": "Fiche CT INDUCTION"
+    },
+    {
+      "page": 16,
+      "keyword": "AGE",
+      "context": "Page 16/56"
+    },
+    {
+      "page": 16,
+      "keyword": "ECOG",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 16,
+      "keyword": "PERFORMANCE",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 17,
+      "keyword": "CT",
+      "context": "Cycle:  C1 CT induction  C2 CT induction ◼ C3 CT induction  C4 CT induction  RTCT"
+    },
+    {
+      "page": 17,
+      "keyword": "AGE",
+      "context": "Page 17/56"
+    },
+    {
+      "page": 18,
+      "keyword": "CT",
+      "context": "Fiche CT INDUCTION"
+    },
+    {
+      "page": 18,
+      "keyword": "AGE",
+      "context": "Page 18/56"
+    },
+    {
+      "page": 18,
+      "keyword": "ECOG",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 18,
+      "keyword": "PERFORMANCE",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 19,
+      "keyword": "CT",
+      "context": "(ENTRE DÉBUT D’ADMINISTRATION DE C4 ET DÉBUT D’ADMINISTRATION DE LA RTCT)"
+    },
+    {
+      "page": 19,
+      "keyword": "AGE",
+      "context": "Page 19/56"
+    },
+    {
+      "page": 20,
+      "keyword": "STADE",
+      "context": "Stade T  T0  T1  T2  T3a  T3b  T3c  T3d  T4"
+    },
+    {
+      "page": 20,
+      "keyword": "CT",
+      "context": "M ésorectum"
+    },
+    {
+      "page": 20,
+      "keyword": "ACE",
+      "context": "rgane adjacent"
+    },
+    {
+      "page": 20,
+      "keyword": "AGE",
+      "context": "Page 20/56"
+    },
+    {
+      "page": 20,
+      "keyword": "IRM",
+      "context": "Fiche IRM"
+    },
+    {
+      "page": 20,
+      "keyword": "TUMORAL",
+      "context": "Taille tumorale (plus grand diamètre) (mm)"
+    },
+    {
+      "page": 21,
+      "keyword": "CT",
+      "context": "Dose quotidienne de 2 Gy/ fraction sur 22 fractions,"
+    },
+    {
+      "page": 21,
+      "keyword": "AGE",
+      "context": "Page 21/56"
+    },
+    {
+      "page": 22,
+      "keyword": "CT",
+      "context": "Poids avant RTCT (kg)"
+    },
+    {
+      "page": 22,
+      "keyword": "AGE",
+      "context": "Page 22/56"
+    },
+    {
+      "page": 22,
+      "keyword": "ECOG",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 22,
+      "keyword": "PERFORMANCE",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 23,
+      "keyword": "CT",
+      "context": "Cycle:  C1 CT induction  C2 CT induction  C3 CT induction  C4 CT induction ◼ RTCT"
+    },
+    {
+      "page": 23,
+      "keyword": "AGE",
+      "context": "Page 23/56"
+    },
+    {
+      "page": 24,
+      "keyword": "CT",
+      "context": "Toucher rectal :"
+    },
+    {
+      "page": 24,
+      "keyword": "CM",
+      "context": " Grade 2 Sub-complète (Induration superficielle ou ulcère ≤ 2 cm)"
+    },
+    {
+      "page": 24,
+      "keyword": "AGE",
+      "context": "Page 24/56"
+    },
+    {
+      "page": 24,
+      "keyword": "ECOG",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 24,
+      "keyword": "PERFORMANCE",
+      "context": "Indice de performance (ECOG) :  0  1  2  3  4"
+    },
+    {
+      "page": 24,
+      "keyword": "TUMORAL",
+      "context": " Grade 3 Modérée (Régression tumorale < 50% avec tumeur bourgeonnante)"
+    },
+    {
+      "page": 25,
+      "keyword": "STADE",
+      "context": "Stade T  T0  T1  T2  T3a  T3b  T3  T3d  T4"
+    },
+    {
+      "page": 25,
+      "keyword": "CT",
+      "context": "M ésorectum"
+    },
+    {
+      "page": 25,
+      "keyword": "ACE",
+      "context": "rgane adjacent"
+    },
+    {
+      "page": 25,
+      "keyword": "AGE",
+      "context": "Page 25/56"
+    },
+    {
+      "page": 25,
+      "keyword": "IRM",
+      "context": "Fiche IRM"
+    },
+    {
+      "page": 25,
+      "keyword": "TUMORAL",
+      "context": "Taille tumorale (plus grand diamètre) (mm)"
+    },
+    {
+      "page": 26,
+      "keyword": "STADE",
+      "context": "Stade T  T0  T1  T2  T3a  T3b  T3  T3d  T4"
+    },
+    {
+      "page": 26,
+      "keyword": "CT",
+      "context": "M ésorectum"
+    },
+    {
+      "page": 26,
+      "keyword": "ACE",
+      "context": "rgane adjacent"
+    },
+    {
+      "page": 26,
+      "keyword": "AGE",
+      "context": "Page 26/56"
+    },
+    {
+      "page": 26,
+      "keyword": "IRM",
+      "context": "Fiche IRM"
+    },
+    {
+      "page": 26,
+      "keyword": "TUMORAL",
+      "context": "Taille tumorale (plus grand diamètre) (mm)"
+    },
+    {
+      "page": 27,
+      "keyword": "CT",
+      "context": "Connectez-vous sur le site USMR pour connaître la chirurgie allouée"
+    },
+    {
+      "page": 27,
+      "keyword": "CM",
+      "context": " Tumorectomie chez les bons répondeurs (tumeur ≤ 2 cm et ymrTRG 1-3)"
+    },
+    {
+      "page": 27,
+      "keyword": "AGE",
+      "context": "Page 27/56"
+    },
+    {
+      "page": 28,
+      "keyword": "STADE",
+      "context": "Stade ypT : 0 Pas de reliquat (T0) 1 Intra-épithélial ou intra-muqueux (Tis) └─┘"
+    },
+    {
+      "page": 28,
+      "keyword": "CT",
+      "context": "TUMORECTOMIE"
+    },
+    {
+      "page": 28,
+      "keyword": "ACE",
+      "context": "5 Séreuse (pT4a) 6 Organe adjacent (pT4b) 7  Non évaluable (Tx)"
+    },
+    {
+      "page": 28,
+      "keyword": "AGE",
+      "context": "Page 28/56"
+    },
+    {
+      "page": 28,
+      "keyword": "TUMORAL",
+      "context": "Taille tumorale :"
+    },
+    {
+      "page": 29,
+      "keyword": "STADE",
+      "context": "Stade ypT : 0 Pas de reliquat (T0) 1 Intra-épithélial ou intra-muqueux (Tis) └─┘"
+    },
+    {
+      "page": 29,
+      "keyword": "CT",
+      "context": "RESECTION RECTALE"
+    },
+    {
+      "page": 29,
+      "keyword": "CM",
+      "context": "Longueur de la pièce └─┴─┘,└─┘ cm Taille tumorale └─┴─┘,└─┘ cm X └─┴─┘,└─┘ cm"
+    },
+    {
+      "page": 29,
+      "keyword": "ACE",
+      "context": "5 Séreuse (pT4a) 6 Organe adjacent ( pT4b) 7 Non évaluable (Tx)"
+    },
+    {
+      "page": 29,
+      "keyword": "AGE",
+      "context": "Page 29/56"
+    },
+    {
+      "page": 29,
+      "keyword": "IRM",
+      "context": "Distance tumeur/tranche de section distale └─┴─┴─┘ mm, (confirmée par la microscopie)"
+    },
+    {
+      "page": 29,
+      "keyword": "TUMORAL",
+      "context": "Longueur de la pièce └─┴─┘,└─┘ cm Taille tumorale └─┴─┘,└─┘ cm X └─┴─┘,└─┘ cm"
+    },
+    {
+      "page": 30,
+      "keyword": "CT",
+      "context": "En cas de tumorectomie, si ypT2Nx/cN1, ypT3, ou R1."
+    },
+    {
+      "page": 30,
+      "keyword": "CN",
+      "context": "En cas de tumorectomie, si ypT2Nx/cN1, ypT3, ou R1."
+    },
+    {
+      "page": 30,
+      "keyword": "CM",
+      "context": "Hauteur de l’anastomose : └─┴─┘ , └─┘ cm / marge anale"
+    },
+    {
+      "page": 30,
+      "keyword": "AGE",
+      "context": "Page 30/56"
+    },
+    {
+      "page": 31,
+      "keyword": "STADE",
+      "context": "Stade ypT : 0 Pas de reliquat (T0) 1 Intra-épithélial ou intra-muqueux (Tis) └─┘"
+    },
+    {
+      "page": 31,
+      "keyword": "CT",
+      "context": "RESECTION RECTALE"
+    },
+    {
+      "page": 31,
+      "keyword": "CM",
+      "context": "Longueur de la pièce └─┴─┘,└─┘ cm Taille tumorale └─┴─┘,└─┘ cm X └─┴─┘,└─┘ cm"
+    },
+    {
+      "page": 31,
+      "keyword": "ACE",
+      "context": "5 Séreuse (pT4a) 6 Organe adjacent ( pT4b) 7 Non évaluable (Tx)"
+    },
+    {
+      "page": 31,
+      "keyword": "AGE",
+      "context": "Page 31/56"
+    },
+    {
+      "page": 31,
+      "keyword": "IRM",
+      "context": "Distance tumeur/tranche de section distale └─┴─┴─┘ mm, (confirmée par la microscopie)"
+    },
+    {
+      "page": 31,
+      "keyword": "TUMORAL",
+      "context": "Longueur de la pièce └─┴─┘,└─┘ cm Taille tumorale └─┴─┘,└─┘ cm X └─┴─┘,└─┘ cm"
+    },
+    {
+      "page": 32,
+      "keyword": "CT",
+      "context": " Initial  Après résection rectale complémentaire"
+    },
+    {
+      "page": 32,
+      "keyword": "AGE",
+      "context": "Page 32/56"
+    },
+    {
+      "page": 33,
+      "keyword": "CT",
+      "context": "APRES RESECTION RECTALE COMPLEMENTAIRE"
+    },
+    {
+      "page": 33,
+      "keyword": "AGE",
+      "context": "Page 33/56"
+    },
+    {
+      "page": 34,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 34,
+      "keyword": "AGE",
+      "context": "Page 34/56"
+    },
+    {
+      "page": 35,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 35,
+      "keyword": "AGE",
+      "context": "Page 35/56"
+    },
+    {
+      "page": 36,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 36,
+      "keyword": "AGE",
+      "context": "Page 36/56"
+    },
+    {
+      "page": 37,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 37,
+      "keyword": "AGE",
+      "context": "Page 37/56"
+    },
+    {
+      "page": 38,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 38,
+      "keyword": "AGE",
+      "context": "Page 38/56"
+    },
+    {
+      "page": 39,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 39,
+      "keyword": "AGE",
+      "context": "Page 39/56"
+    },
+    {
+      "page": 40,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 40,
+      "keyword": "AGE",
+      "context": "Page 40/56"
+    },
+    {
+      "page": 41,
+      "keyword": "CT",
+      "context": "1  oui 0  non (à cocher aussi pour les tumorectomies) └─┘"
+    },
+    {
+      "page": 41,
+      "keyword": "AGE",
+      "context": "Page 41 /56"
+    },
+    {
+      "page": 42,
+      "keyword": "AGE",
+      "context": "└─┴─┘ └─┴─┴─┘ └─┴─┴─┴─┘ Page 42/56"
+    },
+    {
+      "page": 43,
+      "keyword": "AGE",
+      "context": "Page 43/56"
+    },
+    {
+      "page": 44,
+      "keyword": "AGE",
+      "context": "Page 44/56"
+    },
+    {
+      "page": 45,
+      "keyword": "AGE",
+      "context": "Page 45/56"
+    },
+    {
+      "page": 46,
+      "keyword": "AGE",
+      "context": "GRECCAR 12 NOTIFICATION EI / EIG Page 46/56"
+    },
+    {
+      "page": 46,
+      "keyword": "IRM",
+      "context": "Grossesse Dès confirmation de la grossesse"
+    },
+    {
+      "page": 46,
+      "keyword": "SURVIE",
+      "context": "nouveau ou toute grossesse s’il survient :"
+    },
+    {
+      "page": 47,
+      "keyword": "MARQUEUR",
+      "context": "Marqueurs  oui  non"
+    },
+    {
+      "page": 47,
+      "keyword": "AGE",
+      "context": "Page 47/56"
+    },
+    {
+      "page": 47,
+      "keyword": "IMAGERIE",
+      "context": "Imagerie  oui  non"
+    },
+    {
+      "page": 48,
+      "keyword": "MARQUEUR",
+      "context": "Marqueurs  oui  non"
+    },
+    {
+      "page": 48,
+      "keyword": "AGE",
+      "context": "Page 48/56"
+    },
+    {
+      "page": 48,
+      "keyword": "IMAGERIE",
+      "context": "Imagerie  oui  non"
+    },
+    {
+      "page": 49,
+      "keyword": "CT",
+      "context": "Emetteur : Direction de la Recherche Clinique et de l’Innovation du CHU de Bordeaux"
+    },
+    {
+      "page": 49,
+      "keyword": "CM",
+      "context": "M❑ F❑ , cm"
+    },
+    {
+      "page": 49,
+      "keyword": "ACE",
+      "context": "2 - ❑ Menace vitale immédiate"
+    },
+    {
+      "page": 49,
+      "keyword": "AGE",
+      "context": "Page : 49/54"
+    },
+    {
+      "page": 49,
+      "keyword": "SEXE",
+      "context": "Date de naissance : (jj/mm/aaaa) Date de l’inclusion : (jj/mm/aaaa) Sexe : Poids : kg Taille :"
+    },
+    {
+      "page": 50,
+      "keyword": "CT",
+      "context": "Emetteur : Direction de la Recherche Clinique et de l’Innovation du CHU de Bordeaux"
+    },
+    {
+      "page": 50,
+      "keyword": "CM",
+      "context": "M❑ F❑ , cm"
+    },
+    {
+      "page": 50,
+      "keyword": "ACE",
+      "context": "➢ A une maladie préexistante, sous-jacente ou intercurrente ❑ Non ❑ Oui, Si oui préciser : ............................."
+    },
+    {
+      "page": 50,
+      "keyword": "AGE",
+      "context": "Page : 50/56"
+    },
+    {
+      "page": 50,
+      "keyword": "SEXE",
+      "context": "Date de naissance : (jj/mm/aaaa) Date de l’inclusion : (jj/mm/aaaa) Sexe : Poids : kg Taille :"
+    },
+    {
+      "page": 51,
+      "keyword": "CT",
+      "context": "Emetteur : Direction de la Recherche Clinique et de l’Innovation du CHU de Bordeaux"
+    },
+    {
+      "page": 51,
+      "keyword": "CM",
+      "context": "M❑ F❑ , cm"
+    },
+    {
+      "page": 51,
+      "keyword": "ACE",
+      "context": "➢ A une maladie préexistante, sous-jacente ou intercurrente ❑ Non ❑ Oui, Si oui préciser : ............................."
+    },
+    {
+      "page": 51,
+      "keyword": "AGE",
+      "context": "Page : 51/56"
+    },
+    {
+      "page": 51,
+      "keyword": "SEXE",
+      "context": "Date de naissance : (jj/mm/aaaa) Date de l’inclusion : (jj/mm/aaaa) Sexe : Poids : kg Taille :"
+    },
+    {
+      "page": 52,
+      "keyword": "CT",
+      "context": "Emetteur : Direction de la Recherche Clinique et de l’Innovation du CHU de Bordeaux"
+    },
+    {
+      "page": 52,
+      "keyword": "CM",
+      "context": "M❑ F❑ , cm"
+    },
+    {
+      "page": 52,
+      "keyword": "ACE",
+      "context": "2 - ❑ Menace vitale immédiate"
+    },
+    {
+      "page": 52,
+      "keyword": "AGE",
+      "context": "Page : 52/56"
+    },
+    {
+      "page": 52,
+      "keyword": "SEXE",
+      "context": "Date de naissance : (jj/mm/aaaa) Date de l’inclusion : (jj/mm/aaaa) Sexe : Poids : kg Taille :"
+    },
+    {
+      "page": 53,
+      "keyword": "CT",
+      "context": "Emetteur : Direction de la Recherche Clinique et de l’Innovation du CHU de Bordeaux"
+    },
+    {
+      "page": 53,
+      "keyword": "CM",
+      "context": "M❑ F❑ , cm"
+    },
+    {
+      "page": 53,
+      "keyword": "ACE",
+      "context": "➢ A une maladie préexistante, sous-jacente ou intercurrente ❑ Non ❑ Oui, Si oui préciser : ............................."
+    },
+    {
+      "page": 53,
+      "keyword": "AGE",
+      "context": "Page : 53/56"
+    },
+    {
+      "page": 53,
+      "keyword": "SEXE",
+      "context": "Date de naissance : (jj/mm/aaaa) Date de l’inclusion : (jj/mm/aaaa) Sexe : Poids : kg Taille :"
+    },
+    {
+      "page": 54,
+      "keyword": "CT",
+      "context": "Emetteur : Direction de la Recherche Clinique et de l’Innovation du CHU de Bordeaux"
+    },
+    {
+      "page": 54,
+      "keyword": "CM",
+      "context": "M❑ F❑ , cm"
+    },
+    {
+      "page": 54,
+      "keyword": "ACE",
+      "context": "➢ A une maladie préexistante, sous-jacente ou intercurrente ❑ Non ❑ Oui, Si oui préciser : ............................."
+    },
+    {
+      "page": 54,
+      "keyword": "AGE",
+      "context": "Page : 54/56"
+    },
+    {
+      "page": 54,
+      "keyword": "SEXE",
+      "context": "Date de naissance : (jj/mm/aaaa) Date de l’inclusion : (jj/mm/aaaa) Sexe : Poids : kg Taille :"
+    },
+    {
+      "page": 55,
+      "keyword": "AGE",
+      "context": "Page 55/56"
+    },
+    {
+      "page": 55,
+      "keyword": "DECES",
+      "context": "DECES Version n°1.0 du 17/11/2015"
+    },
+    {
+      "page": 56,
+      "keyword": "CT",
+      "context": "(date du dernier contact avec le participant ; aucun examen lié à l’étude, ni administration du traitement de l’étude ap"
+    },
+    {
+      "page": 56,
+      "keyword": "AGE",
+      "context": "Page 56/56"
+    },
+    {
+      "page": 56,
+      "keyword": "IRM",
+      "context": "« Je, soussigné(e) Pr/Dr ………………………………………………, confirme que le suivi du"
+    },
+    {
+      "page": 57,
+      "keyword": "CT",
+      "context": "mauvaise ” réponse. Ces informations sont strictement confidentielles"
+    },
+    {
+      "page": 57,
+      "keyword": "AGE",
+      "context": "Page 1/5"
+    },
+    {
+      "page": 57,
+      "keyword": "IRM",
+      "context": " Patient  Médecin  Psychologue  Infirmière  Arc site  Autre, préciser"
+    },
+    {
+      "page": 58,
+      "keyword": "CT",
+      "context": "19. Des douleurs ont-elles perturbé vos activités quotidiennes ?     └─┘"
+    },
+    {
+      "page": 58,
+      "keyword": "AGE",
+      "context": "Page 2/5"
+    },
+    {
+      "page": 59,
+      "keyword": "CT",
+      "context": "plaît, si, durant la semaine passée, vous avez été affecté(e) par l'un de ces symptômes ou problèmes."
+    },
+    {
+      "page": 59,
+      "keyword": "AGE",
+      "context": "Page 3/5"
+    },
+    {
+      "page": 60,
+      "keyword": "CT",
+      "context": "63. Avez-vous eu des difficultés à avoir une érection ou à"
+    },
+    {
+      "page": 60,
+      "keyword": "AGE",
+      "context": "Page 4/5"
+    },
+    {
+      "page": 61,
+      "keyword": "AGE",
+      "context": "Page 5/5"
+    },
+    {
+      "page": 62,
+      "keyword": "CT",
+      "context": "mauvaise ” réponse. Ces informations sont strictement confidentielles"
+    },
+    {
+      "page": 62,
+      "keyword": "AGE",
+      "context": "Page 1/5"
+    },
+    {
+      "page": 62,
+      "keyword": "IRM",
+      "context": " Patient  Médecin  Psychologue  Infirmière  Arc site  Autre, préciser"
+    },
+    {
+      "page": 63,
+      "keyword": "CT",
+      "context": "19. Des douleurs ont-elles perturbé vos activités quotidiennes ?     └─┘"
+    },
+    {
+      "page": 63,
+      "keyword": "AGE",
+      "context": "Page 2/5"
+    },
+    {
+      "page": 64,
+      "keyword": "CT",
+      "context": "plaît, si, durant la semaine passée, vous avez été affecté(e) par l'un de ces symptômes ou problèmes."
+    },
+    {
+      "page": 64,
+      "keyword": "AGE",
+      "context": "Page 3/5"
+    },
+    {
+      "page": 65,
+      "keyword": "CT",
+      "context": "63. Avez-vous eu des difficultés à avoir une érection ou à"
+    },
+    {
+      "page": 65,
+      "keyword": "AGE",
+      "context": "Page 4/5"
+    },
+    {
+      "page": 66,
+      "keyword": "AGE",
+      "context": "Page 5/5"
+    },
+    {
+      "page": 67,
+      "keyword": "CT",
+      "context": "mauvaise ” réponse. Ces informations sont strictement confidentielles"
+    },
+    {
+      "page": 67,
+      "keyword": "AGE",
+      "context": "Page 6/5"
+    },
+    {
+      "page": 67,
+      "keyword": "IRM",
+      "context": " Patient  Médecin  Psychologue  Infirmière  Arc site  Autre, préciser"
+    },
+    {
+      "page": 68,
+      "keyword": "CT",
+      "context": "19. Des douleurs ont-elles perturbé vos activités quotidiennes ?     └─┘"
+    },
+    {
+      "page": 68,
+      "keyword": "AGE",
+      "context": "Page 7/5"
+    },
+    {
+      "page": 69,
+      "keyword": "CT",
+      "context": "plaît, si, durant la semaine passée, vous avez été affecté(e) par l'un de ces symptômes ou problèmes."
+    },
+    {
+      "page": 69,
+      "keyword": "AGE",
+      "context": "Page 8/5"
+    },
+    {
+      "page": 70,
+      "keyword": "CT",
+      "context": "63. Avez-vous eu des difficultés à avoir une érection ou à"
+    },
+    {
+      "page": 70,
+      "keyword": "AGE",
+      "context": "Page 9/5"
+    },
+    {
+      "page": 71,
+      "keyword": "AGE",
+      "context": "└─┴─┘ └─┴─┴─┘ └─┴─┴─┴─┘ Page 10/5"
+    },
+    {
+      "page": 72,
+      "keyword": "CT",
+      "context": "Actualisation du suivi à la date de point : 1 oui"
+    }
+  ]
+}

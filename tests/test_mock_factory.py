@@ -1,4 +1,9 @@
-from predi_care.engine.mock_factory import generate_mock_cohort, generate_mock_patient
+from predi_care.engine.mock_factory import (
+    get_preset_scenario,
+    generate_mock_cohort,
+    generate_mock_patient,
+    list_preset_scenarios,
+)
 
 
 def test_mock_patient_is_reproducible_with_seed() -> None:
@@ -26,3 +31,16 @@ def test_mock_patient_has_required_keys() -> None:
         "performance_status",
     }
     assert required.issubset(patient.keys())
+
+
+def test_preset_scenario_catalog_is_accessible() -> None:
+    scenario_names = list_preset_scenarios()
+    assert len(scenario_names) > 0
+
+    scenario = get_preset_scenario(scenario_names[0])
+    assert scenario is not None
+    assert {"ct_stage", "cn_stage", "cm_stage"}.issubset(scenario.keys())
+
+
+def test_get_preset_scenario_returns_none_for_unknown_name() -> None:
+    assert get_preset_scenario("__unknown__") is None

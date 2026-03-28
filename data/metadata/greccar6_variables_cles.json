@@ -1,0 +1,266 @@
+{
+  "study": "GRECCAR6",
+  "total_variables": 37,
+  "categories": {
+    "Démographie": {
+      "count": 2,
+      "variables": [
+        {
+          "ligne": 9,
+          "intitule": "Sexe",
+          "nom_variable": "",
+          "choix_possibles": "M ou F"
+        },
+        {
+          "ligne": 86,
+          "intitule": "Drainage",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        }
+      ]
+    },
+    "Performance": {
+      "count": 1,
+      "variables": [
+        {
+          "ligne": 12,
+          "intitule": "Performance status apprécié par l’échelle de l’Eastern Cooperative Oncology Group (ECOG) : 0-1",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        }
+      ]
+    },
+    "Staging TNM": {
+      "count": 11,
+      "variables": [
+        {
+          "ligne": 14,
+          "intitule": "Tumeur classée T3-T4N0, TxN+ à l’écho-endoscopie et à l’IRM, sans localisation secondaire (M0) sur l",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 22,
+          "intitule": "Tumeur classée T1 ou T2N0 à l’écho-endoscopie et à l’IRM",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 45,
+          "intitule": "Préciser le stade pré-thérapeutique déterminé par l'écho-endoscopie (usTNM) :",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 144,
+          "intitule": "Stade T",
+          "nom_variable": "",
+          "choix_possibles": "0= ypT0 / 1= ypT1 / 2= ypT2 / 3= ypT3 / 4= ypT4a / 5= ypT4b / 6= ypTis / 7= ypTx"
+        },
+        {
+          "ligne": 145,
+          "intitule": "Si stade T1",
+          "nom_variable": "",
+          "choix_possibles": "1= ypT1sm1 / 2= ypT1sm2 / 3= ypT1sm3"
+        },
+        {
+          "ligne": 148,
+          "intitule": "Stade N",
+          "nom_variable": "",
+          "choix_possibles": "0= N0 / 1= N1a / 1= N1b / 3 = N1c / 4=N2a / 5= N2b / 6= Nx"
+        },
+        {
+          "ligne": 151,
+          "intitule": "Stade M",
+          "nom_variable": "",
+          "choix_possibles": "0=M0 / 1= M1a / 2=M1b / 3=Mx"
+        },
+        {
+          "ligne": 155,
+          "intitule": "Stade T",
+          "nom_variable": "",
+          "choix_possibles": "0= ypT0 / 1= ypT1 / 2= ypT2 / 3= ypT3 / 4= ypT4 / 5= ypTx / 6= ypTis"
+        },
+        {
+          "ligne": 156,
+          "intitule": "Si stade T1",
+          "nom_variable": "",
+          "choix_possibles": "1= ypT1sm1 / 2= ypT1sm2 / 3= ypT1sm3"
+        },
+        {
+          "ligne": 162,
+          "intitule": "Stade T",
+          "nom_variable": "",
+          "choix_possibles": "0=ypT0 / 1= ypT1 / 2= ypT2 / 3= ypT3 / 4= ypT4 / 5= ypTx / 6= ypTis"
+        }
+      ]
+    },
+    "Marqueurs Bio": {
+      "count": 0,
+      "variables": []
+    },
+    "Imagerie": {
+      "count": 6,
+      "variables": [
+        {
+          "ligne": 14,
+          "intitule": "Tumeur classée T3-T4N0, TxN+ à l’écho-endoscopie et à l’IRM, sans localisation secondaire (M0) sur l",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 22,
+          "intitule": "Tumeur classée T1 ou T2N0 à l’écho-endoscopie et à l’IRM",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 39,
+          "intitule": "Biopsie confirmant le diagnostic",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 43,
+          "intitule": "Echo-endoscopie faite",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 45,
+          "intitule": "Préciser le stade pré-thérapeutique déterminé par l'écho-endoscopie (usTNM) :",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 49,
+          "intitule": "IRM pelvienne faite",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        }
+      ]
+    },
+    "Résidu/Réponse": {
+      "count": 12,
+      "variables": [
+        {
+          "ligne": 51,
+          "intitule": "hauteur tumorale (cm)",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 74,
+          "intitule": "Régression tumorale clinique",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 75,
+          "intitule": "Grade Régression tumorale clinique",
+          "nom_variable": "",
+          "choix_possibles": "1= <50% / 2= >50% / 3= Simple cicatrice / 4 = Muqueuse normale"
+        },
+        {
+          "ligne": 127,
+          "intitule": "Taille tumorale (cm)",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 137,
+          "intitule": "Si pas de reliquat tumoral, inclusion en totalité de la pièce",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 143,
+          "intitule": "Marge circonférentielle (par rapport à un ganglion ou un nodule tumoral) (mm)",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 146,
+          "intitule": "Grade de régression tumorale TRG (Rödel)",
+          "nom_variable": "",
+          "choix_possibles": "0= TRG0 - Pas de régression / 1= TRG1- Régression mineure (masse tumorale dominante avec moins de 25"
+        },
+        {
+          "ligne": 147,
+          "intitule": "Grade de régression tumorale TRG (Dworak)",
+          "nom_variable": "",
+          "choix_possibles": "0= Grade 0 - Pas de régression / 1= Grade 1 - Masse tumorale dominante avec de la fibrose visible / "
+        },
+        {
+          "ligne": 157,
+          "intitule": "Grade de régression tumorale TRG (Rödel)",
+          "nom_variable": "",
+          "choix_possibles": "0= TRG0 - Pas de régression / 1= TRG1- Régression mineure (masse tumorale dominante avec moins de 25"
+        },
+        {
+          "ligne": 158,
+          "intitule": "Grade de régression tumorale TRG (Dworak)",
+          "nom_variable": "",
+          "choix_possibles": "0= Grade 0 - Pas de régression / 1= Grade 1 - Masse tumorale dominante avec de la fibrose visible / "
+        }
+      ]
+    },
+    "Traitement": {
+      "count": 8,
+      "variables": [
+        {
+          "ligne": 15,
+          "intitule": "Patient ayant bénéficié d’un protocole de radiothérapie entre 45-50 Gy et chimiothérapie à base de 5",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 25,
+          "intitule": "Patient n’ayant pas terminé le protocole complet de chimiothérapie",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 57,
+          "intitule": "Radiochimiothérapie",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 58,
+          "intitule": "Date de début de la radiochimiothérapie",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 61,
+          "intitule": "Type de chimiothérapie associée",
+          "nom_variable": "",
+          "choix_possibles": "1= 5 FU / 2= 5FU + Oxaliplatine® / 3= Autre"
+        },
+        {
+          "ligne": 63,
+          "intitule": "Date de fin de la radiochimiothérapie",
+          "nom_variable": "",
+          "choix_possibles": ""
+        },
+        {
+          "ligne": 221,
+          "intitule": "Chimiothérapie adjuvante",
+          "nom_variable": "",
+          "choix_possibles": "0= Non / 1= Oui"
+        },
+        {
+          "ligne": 223,
+          "intitule": "Type de chimiothérapie",
+          "nom_variable": "",
+          "choix_possibles": "1= FOLFOX® / 2= FOLFIRI® / 3= Autre"
+        }
+      ]
+    },
+    "Suivi": {
+      "count": 0,
+      "variables": []
+    }
+  }
+}
