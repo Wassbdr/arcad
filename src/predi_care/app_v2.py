@@ -331,14 +331,14 @@ def _render_cohort_results(load_result: LoadResult, entries: list[CohortSimulati
     st.markdown("### Analyse Cohorte")
 
     if load_result.errors:
-        st.error(f"{len(load_result.errors)} erreur(s) detectee(s) dans le CSV.")
+        st.error(f"{len(load_result.errors)} erreur(s) détectée(s) dans le CSV.")
         for issue in load_result.errors:
             st.error(
                 f"Ligne {issue.row_number} | {issue.field}: {issue.message}"
             )
 
     if load_result.warnings:
-        st.warning(f"{len(load_result.warnings)} avertissement(s) detecte(s).")
+        st.warning(f"{len(load_result.warnings)} avertissement(s) détecté(s).")
         for issue in load_result.warnings:
             st.warning(
                 f"Ligne {issue.row_number} | {issue.field}: {issue.message}"
@@ -356,7 +356,7 @@ def _render_cohort_results(load_result: LoadResult, entries: list[CohortSimulati
     mean_dfs_5y_ww = sum(entry["dfs_5y_watch_wait"] for entry in entries) / len(entries)
 
     top_row = st.columns(4)
-    top_row[0].metric("Patients simules", str(len(entries)))
+    top_row[0].metric("Patients simulés", str(len(entries)))
     top_row[1].metric("Reco chirurgie", str(surgery_count))
     top_row[2].metric("Reco W&W", str(watch_wait_count))
     top_row[3].metric("Reco incertaine", str(uncertain_count))
@@ -377,9 +377,9 @@ def _render_cohort_results(load_result: LoadResult, entries: list[CohortSimulati
         ]
     )
     recommendation_chart.update_layout(
-        title="Repartition des recommandations",
+        title="Répartition des recommandations",
         yaxis_title="Nombre de patients",
-        xaxis_title="Scenario recommande",
+        xaxis_title="Scénario recommandé",
         showlegend=False,
         margin={"l": 40, "r": 20, "t": 50, "b": 40},
         height=320,
@@ -481,7 +481,7 @@ def _render_cohort_results(load_result: LoadResult, entries: list[CohortSimulati
                 "qol_watch_wait": f"{entry['qol_watch_wait']:.1f}",
             }
         )
-    st.caption(f"Patients affiches apres filtres: {len(display_rows)} / {len(entries)}")
+    st.caption(f"Patients affichés après filtres: {len(display_rows)} / {len(entries)}")
     st.dataframe(display_rows, width="stretch")
 
     enriched_csv_data = _build_enriched_cohort_csv(entries, subgroup_stats)
@@ -490,7 +490,7 @@ def _render_cohort_results(load_result: LoadResult, entries: list[CohortSimulati
 
     with export_col1:
         st.download_button(
-            label="Exporter la synthese cohorte (CSV)",
+            label="Exporter la synthèse cohorte (CSV)",
             data=enriched_csv_data,
             file_name="predi_care_cohorte_enrichie.csv",
             mime="text/csv",
@@ -514,7 +514,7 @@ def _render_cohort_results(load_result: LoadResult, entries: list[CohortSimulati
                 error_messages=error_messages,
             )
         except Exception:
-            st.error("L'export PDF cohorte a echoue. Reessayez apres une nouvelle analyse.")
+            st.error("L'export PDF cohorte a échoué. Réessayez après une nouvelle analyse.")
         else:
             st.download_button(
                 label="Exporter le rapport cohorte (PDF)",
@@ -572,7 +572,7 @@ def render_header() -> None:
                 margin-top: 0.5rem;
                 margin-bottom: 0;
                 font-weight: 400;
-            ">Simulateur Decisionnel Cancer du Rectum</p>
+            ">Outil Décisionnel Cancer du Rectum</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -591,7 +591,7 @@ def render_sidebar() -> SidebarSubmission:
             letter-spacing: 0.08em;
             color: #8993A4;
             margin-bottom: 1rem;
-        ">Donnees Patient</p>
+        ">Données Patient</p>
         """,
         unsafe_allow_html=True,
     )
@@ -600,7 +600,7 @@ def render_sidebar() -> SidebarSubmission:
     scenario_names = ["-- Saisie manuelle --"] + list_preset_scenarios()
     if st.session_state.get("selected_demo_scenario") not in scenario_names:
         st.session_state["selected_demo_scenario"] = "-- Saisie manuelle --"
-    selected = st.sidebar.selectbox("Scenario Demo", scenario_names, key="selected_demo_scenario")
+    selected = st.sidebar.selectbox("Scénario Démo", scenario_names, key="selected_demo_scenario")
 
     if selected != "-- Saisie manuelle --":
         preset = get_preset_scenario(selected)
@@ -639,32 +639,34 @@ def render_sidebar() -> SidebarSubmission:
         "Stade M (cM)",
         ["cM0", "cM1"],
         index=default_cm,
-        help="Metastases a distance",
+        help="Métastases à distance",
     )
 
     st.sidebar.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
     # Tumor Response section
     st.sidebar.markdown(
-        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Reponse Tumorale</p>',
+        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Réponse Tumorale</p>',
         unsafe_allow_html=True,
     )
 
     default_residual = preset["residual_tumor_ratio"] if preset else 15.0
     residual_tumor_ratio = st.sidebar.slider(
-        "Residu tumoral (%)",
+        "Résidu tumoral (%)",
         0.0,
         100.0,
         float(default_residual),
         5.0,
-        help="0% = reponse complete",
+        help="0% = réponse complète",
     )
 
     default_quality = ["Elevee", "Moyenne", "Basse"].index(preset["imaging_quality"]) if preset else 0
+    imaging_quality_labels = {"Elevee": "Élevée", "Moyenne": "Moyenne", "Basse": "Basse"}
     imaging_quality = st.sidebar.selectbox(
-        "Qualite IRM",
+        "Qualité IRM",
         ["Elevee", "Moyenne", "Basse"],
         index=default_quality,
+        format_func=lambda value: imaging_quality_labels.get(value, value),
     )
 
     st.sidebar.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
@@ -703,7 +705,7 @@ def render_sidebar() -> SidebarSubmission:
 
     default_age = preset["age"] if preset else 62
     age = st.sidebar.number_input(
-        "Age (annees)",
+        "Âge (années)",
         min_value=18,
         max_value=100,
         value=int(default_age),
@@ -722,7 +724,7 @@ def render_sidebar() -> SidebarSubmission:
 
     # --- Advanced Tumor Characterization ---
     st.sidebar.markdown(
-        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Caracterisation Tumorale</p>',
+        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Caractérisation Tumorale</p>',
         unsafe_allow_html=True,
     )
 
@@ -735,7 +737,7 @@ def render_sidebar() -> SidebarSubmission:
 
     default_delay = preset.get("delay_weeks_post_rct", 8) if preset else 8
     delay_weeks_post_rct = st.sidebar.slider(
-        "Delai post-RCT (semaines)",
+        "Délai post-RCT (semaines)",
         4, 16, int(default_delay), 1,
         help="GRECCAR 6: 11 sem → +12% pCR vs 7 sem",
     )
@@ -743,7 +745,7 @@ def render_sidebar() -> SidebarSubmission:
     protocols = ["RCT standard", "FOLFIRINOX+CAP50", "TNT"]
     default_proto = protocols.index(preset.get("protocol_neoadjuvant", "RCT standard")) if preset and preset.get("protocol_neoadjuvant") in protocols else 0
     protocol_neoadjuvant = st.sidebar.selectbox(
-        "Protocole neoadjuvant", protocols, index=default_proto,
+        "Protocole néoadjuvant", protocols, index=default_proto,
         help="GRECCAR 12: FOLFIRINOX+CAP50 → 71% pCR si tumeur < 4cm",
     )
 
@@ -751,47 +753,49 @@ def render_sidebar() -> SidebarSubmission:
     default_mrtrg = int(preset.get("mrtrg", 3)) - 1 if preset else 2
     mrtrg = st.sidebar.selectbox(
         "mrTRG IRM", mrtrg_options, index=default_mrtrg,
-        help="1-2 = favorable, 4-5 = defavorable",
+        help="1-2 = favorable, 4-5 = défavorable",
     )
 
     default_emvi = preset.get("emvi", False) if preset else False
     emvi = st.sidebar.checkbox(
         "EMVI (invasion vasculaire)", value=bool(default_emvi),
-        help="Invasion vasculaire extramurale: recidive systemique +8%",
+        help="Invasion vasculaire extramurale: récidive systémique +8%",
     )
 
     st.sidebar.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
     # --- Extended Biomarkers ---
     st.sidebar.markdown(
-        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Biomarqueurs Etendus</p>',
+        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Biomarqueurs Étendus</p>',
         unsafe_allow_html=True,
     )
 
     default_alb = preset.get("albumin", 40.0) if preset else 40.0
     albumin = st.sidebar.number_input(
         "Albumine (g/L)", 15.0, 55.0, float(default_alb), 1.0,
-        help="< 35 g/L: denutrition → +4% complications",
+        help="< 35 g/L: dénutrition → +4% complications",
     )
 
     default_hb = preset.get("hemoglobin", 13.5) if preset else 13.5
     hemoglobin = st.sidebar.number_input(
-        "Hemoglobine (g/dL)", 5.0, 20.0, float(default_hb), 0.5,
-        help="< 12 g/dL: reduit efficacite RT",
+        "Hémoglobine (g/dL)", 5.0, 20.0, float(default_hb), 0.5,
+        help="< 12 g/dL: réduit efficacité RT",
     )
 
     msi_options = ["MSS/MSI-L", "dMMR/MSI-H", "Non teste"]
     default_msi = msi_options.index(preset.get("msi_status", "Non teste")) if preset and preset.get("msi_status") in msi_options else 2
+    msi_labels = {"MSS/MSI-L": "MSS/MSI-L", "dMMR/MSI-H": "dMMR/MSI-H", "Non teste": "Non testé"}
     msi_status = st.sidebar.selectbox(
         "Statut MSI", msi_options, index=default_msi,
-        help="dMMR/MSI-H: reponse complete tres probable (>60%)",
+        format_func=lambda value: msi_labels.get(value, value),
+        help="dMMR/MSI-H: réponse complète très probable (>60%)",
     )
 
     st.sidebar.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
     # --- Comorbidities ---
     st.sidebar.markdown(
-        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Comorbidites</p>',
+        '<p style="font-size: 0.75rem; font-weight: 600; color: #0066FF; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">Comorbidités</p>',
         unsafe_allow_html=True,
     )
 
@@ -810,7 +814,7 @@ def render_sidebar() -> SidebarSubmission:
 
     default_diabetes = preset.get("diabetes", False) if preset else False
     diabetes = st.sidebar.checkbox(
-        "Diabete", value=bool(default_diabetes),
+        "Diabète", value=bool(default_diabetes),
     )
 
     st.sidebar.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
@@ -884,17 +888,17 @@ def render_welcome_screen() -> None:
     feature_cards = [
         {
             "title": "Simulation CRF",
-            "desc": "Mapping automatique depuis les protocoles GRECCAR avec variables validees",
+            "desc": "Mapping automatique depuis les protocoles GRECCAR avec variables validées",
             "color": "#0066FF",
         },
         {
-            "title": "Modele Probabiliste",
-            "desc": "Prediction Bayesian-style basee sur les donnees de survie GRECCAR 12",
+            "title": "Modèle Probabiliste",
+            "desc": "Prédiction Bayesian-style basée sur les données de survie GRECCAR 12",
             "color": "#00C896",
         },
         {
-            "title": "Explicabilite",
-            "desc": "Contributions SHAP-style pour comprendre chaque decision",
+            "title": "Explicabilité",
+            "desc": "Contributions SHAP-style pour comprendre chaque décision",
             "color": "#FF8B00",
         },
     ]
@@ -930,7 +934,7 @@ def render_welcome_screen() -> None:
             text-align: center;
         ">
             <p style="color: #5E6C84; margin: 0; font-size: 0.95rem;">
-                Selectionnez un scenario demo ou completez les donnees patient pour demarrer
+                Sélectionnez un scénario démo ou complétez les données patient pour démarrer
             </p>
         </div>
         """,
@@ -949,10 +953,10 @@ def render_export_section(result: DecisionResult) -> None:
         try:
             pdf_bytes = generate_pdf_report(result)
         except Exception:
-            st.error("L'export PDF a echoue. Veuillez relancer la simulation puis reessayer.")
+            st.error("L'export PDF a échoué. Veuillez relancer la simulation puis réessayer.")
             return
         st.download_button(
-            label="Telecharger Rapport PDF",
+            label="Télécharger Rapport PDF",
             data=pdf_bytes,
             file_name="predi_care_rapport.pdf",
             mime="application/pdf",

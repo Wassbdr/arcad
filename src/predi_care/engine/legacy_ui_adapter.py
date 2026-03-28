@@ -25,38 +25,48 @@ def _clamp(value: float, low: float, high: float) -> float:
 def _fr(message: str) -> str:
     replacements = {
         "Surgery has the strongest consensus signal across oncologic control and safety.": (
-            "La chirurgie presente le meilleur consensus en controle oncologique et en securite."
+            "La chirurgie présente le meilleur consensus en contrôle oncologique et en sécurité."
         ),
         "Watch-and-wait has the strongest consensus signal across response and quality of life.": (
-            "La strategie Watch and Wait presente le meilleur consensus sur la reponse et la qualite de vie."
+            "La stratégie Watch and Wait présente le meilleur consensus sur la réponse et la qualité de vie."
         ),
         "Agent disagreement is high; multidisciplinary arbitration is recommended.": (
-            "Le desaccord inter-agents est eleve; une arbitration pluridisciplinaire est recommandee."
+            "Le désaccord inter-agents est élevé; un arbitrage pluridisciplinaire est recommandé."
         ),
         "Hard protocol constraints are triggered and require multidisciplinary review.": (
-            "Des contraintes protocolaires strictes sont activees et imposent une revue pluridisciplinaire."
+            "Des contraintes protocolaires strictes sont activées et imposent une revue pluridisciplinaire."
         ),
-        "If residual lesion decreased by at least": "Si la lesion residuelle diminuait d'au moins",
-        "watch-and-wait would become eligible.": "la surveillance active deviendrait eligible.",
+        "If residual lesion decreased by at least": "Si la lésion résiduelle diminuait d'au moins",
+        "watch-and-wait would become eligible.": "la surveillance active deviendrait éligible.",
         "If TRG improved to 2 or less, watch-and-wait eligibility would increase.": (
-            "Si le TRG s'ameliorait a 2 ou moins, l'eligibilite a la surveillance active augmenterait."
+            "Si le TRG s'améliorait à 2 ou moins, l'éligibilité à la surveillance active augmenterait."
         ),
-        "If CEA/ACE current value dropped by 10% to": "Si la valeur actuelle de l'ACE diminuait de 10% jusqu'a",
-        "watch-and-wait score would improve.": "le score de surveillance active s'ameliorerait.",
+        "If CEA/ACE current value dropped by 10% to": "Si la valeur actuelle de l'ACE diminuait de 10% jusqu'à",
+        "watch-and-wait score would improve.": "le score de surveillance active s'améliorerait.",
         "If CRM margin improved by 1 mm, surgery confidence would increase.": (
-            "Si la marge CRM s'ameliorait de 1 mm, la confiance pour la chirurgie augmenterait."
+            "Si la marge CRM s'améliorait de 1 mm, la confiance pour la chirurgie augmenterait."
         ),
         "Residual lesion above 2 cm blocks watch-and-wait recommendation.": (
-            "Une lesion residuelle au-dessus de 2 cm contre-indique la surveillance active."
+            "Une lésion résiduelle au-dessus de 2 cm contre-indique la surveillance active."
         ),
         "TRG above 2 blocks watch-and-wait recommendation.": (
-            "Un TRG superieur a 2 contre-indique la surveillance active."
+            "Un TRG supérieur à 2 contre-indique la surveillance active."
         ),
         "cM1 requires multidisciplinary escalation.": (
-            "Le stade cM1 impose une escalation pluridisciplinaire."
+            "Le stade cM1 impose une escalade pluridisciplinaire."
         ),
         "ECOG 4 contraindicates surgery and requires multidisciplinary escalation.": (
-            "Un ECOG 4 contre-indique la chirurgie et impose une escalation pluridisciplinaire."
+            "Un ECOG 4 contre-indique la chirurgie et impose une escalade pluridisciplinaire."
+        ),
+        "Des contraintes protocolaires strictes sont activees et imposent une revue pluridisciplinaire.": (
+            "Des contraintes protocolaires strictes sont activées et imposent une revue pluridisciplinaire."
+        ),
+        "Contrefactuel cle:": "Contrefactuel clé:",
+        "Si le TRG s'ameliorait a 2 ou moins, l'eligibilite a la surveillance active augmenterait.": (
+            "Si le TRG s'améliorait à 2 ou moins, l'éligibilité à la surveillance active augmenterait."
+        ),
+        "Un TRG superieur a 2 contre-indique la surveillance active.": (
+            "Un TRG supérieur à 2 contre-indique la surveillance active."
         ),
     }
     translated = message
@@ -98,15 +108,15 @@ def _scenario_complication_lines(label: str, scenario: ScenarioResultV4) -> list
         normalized = name.lower()
         mapping = {
             "lars syndrome": "Syndrome LARS",
-            "anastomotic leak": "Desunion anastomotique",
+            "anastomotic leak": "Désunion anastomotique",
             "infectious complication": "Complication infectieuse",
             "urinary dysfunction": "Dysfonction urinaire",
-            "stoma-related complication": "Complication liee a la stomie",
-            "medical systemic complication": "Complication medicale systemique",
+            "stoma-related complication": "Complication liée à la stomie",
+            "medical systemic complication": "Complication médicale systémique",
             "local regrowth risk": "Risque de repousse locale",
-            "conditional systemic relapse if regrowth": "Risque systemique conditionnel en cas de repousse",
+            "conditional systemic relapse if regrowth": "Risque systémique conditionnel en cas de repousse",
             "surveillance burden": "Charge de surveillance",
-            "follow-up anxiety burden": "Anxiete liee au suivi",
+            "follow-up anxiety burden": "Anxiété liée au suivi",
         }
         return mapping.get(normalized, name)
 
@@ -116,13 +126,13 @@ def _scenario_complication_lines(label: str, scenario: ScenarioResultV4) -> list
             if item.value >= 8.0:
                 lines.append(f"{_fr_name(item.name)}: {item.value:.1f}%")
         if not lines:
-            lines.append("Complications postoperatoires attendues faibles sur ce profil.")
+            lines.append("Complications postopératoires attendues faibles sur ce profil.")
     else:
         for item in scenario.complications:
             if item.value >= 10.0:
                 lines.append(f"{_fr_name(item.name)}: {item.value:.1f}%")
         if not lines:
-            lines.append("Charge de surveillance modÃ©rÃ©e sans signal de repousse Ã©levÃ©.")
+            lines.append("Charge de surveillance modérée sans signal de repousse élevé.")
     return lines
 
 
@@ -192,7 +202,7 @@ def _ace_drop_ratio(result: EngineResultV4) -> float:
 def _build_signed_contributions(result: EngineResultV4) -> dict[str, float]:
     """Convention legacy:
     - Valeur positive: favorise Watch & Wait
-    - Valeur nÃ©gative: favorise Chirurgie
+    - Valeur négative: favorise Chirurgie
     """
     residual_cm = float(result.patient_profile.get("residual_size_cm", 1.0))
     trg = int(result.patient_profile.get("trg", 3))
@@ -209,11 +219,11 @@ def _build_signed_contributions(result: EngineResultV4) -> dict[str, float]:
     frailty_component = (25.0 - frailty_proxy) * -0.45
 
     raw = {
-        "RÃ©ponse radiologique (TRG + rÃ©sidu)": response_component,
+        "Réponse radiologique (TRG + résidu)": response_component,
         "Marge CRM": crm_component,
-        "CinÃ©tique ACE": ace_component,
-        "FragilitÃ© mÃ©dico-chirurgicale": frailty_component,
-        "ContrÃ´le local attendu avec chirurgie": surgery_control_component,
+        "Cinétique ACE": ace_component,
+        "Fragilité médico-chirurgicale": frailty_component,
+        "Contrôle local attendu avec chirurgie": surgery_control_component,
         "Risque de complications chirurgicales": surgery_comp_component,
         "Risque de repousse en surveillance": ww_regrowth_component,
     }
@@ -232,27 +242,27 @@ def _build_french_alerts(result: EngineResultV4) -> list[str]:
     ace_current = float(result.patient_profile.get("ace_current", 0.0))
 
     if cm_stage == "cM1":
-        alerts.append("Stade mÃ©tastatique cM1: discussion RCP oncologique prioritaire.")
+        alerts.append("Stade métastatique cM1: discussion RCP oncologique prioritaire.")
     if ecog >= 4:
-        alerts.append("ECOG 4: chirurgie contre-indiquÃ©e, discussion palliative recommandÃ©e.")
+        alerts.append("ECOG 4: chirurgie contre-indiquée, discussion palliative recommandée.")
     if age >= 80 and asa >= 3:
-        alerts.append("Profil gÃ©riatrique fragile (Ã¢ge >= 80 et ASA >= 3): Ã©valuation gÃ©riatrique formalisÃ©e recommandÃ©e.")
+        alerts.append("Profil gériatrique fragile (âge >= 80 et ASA >= 3): évaluation gériatrique formalisée recommandée.")
     if crm_status == "positive":
-        alerts.append("CRM positif (< 1 mm): risque de marge envahie, privilÃ©gier contrÃ´le local maximal.")
+        alerts.append("CRM positif (< 1 mm): risque de marge envahie, privilégier contrôle local maximal.")
     if ace_current > 5.0:
-        alerts.append("ACE persistante Ã©levÃ©e (> 5 ng/mL): vigilance sur la maladie rÃ©siduelle systÃ©mique.")
+        alerts.append("ACE persistante élevée (> 5 ng/mL): vigilance sur la maladie résiduelle systémique.")
     if result.watch_wait.local_recurrence_2y > 30.0:
-        alerts.append("Risque de repousse locale Ã©levÃ© en surveillance active (> 30% Ã  2 ans).")
+        alerts.append("Risque de repousse locale élevé en surveillance active (> 30% à 2 ans).")
     if result.surgery.major_complication > 25.0:
-        alerts.append("Risque de complications majeures postopÃ©ratoires Ã©levÃ©.")
+        alerts.append("Risque de complications majeures postopératoires élevé.")
 
     for invariant in result.safety.invariants:
         if not invariant.passed:
-            alerts.append(f"Invariant de sÃ©curitÃ© non respectÃ©: {invariant.message}")
+            alerts.append(f"Invariant de sécurité non respecté: {invariant.message}")
 
     alerts = list(dict.fromkeys(alerts))
     if not alerts:
-        alerts.append("Aucune alerte clinique majeure detectee sur ce profil.")
+        alerts.append("Aucune alerte clinique majeure détectée sur ce profil.")
     return alerts
 
 
@@ -261,8 +271,8 @@ def _build_primary_factors_french(result: EngineResultV4) -> list[tuple[str, flo
     rename = {
         "Radiology signal": "Signal radiologique",
         "Biology signal": "Signal biologique",
-        "Surgery R0": "ProbabilitÃ© de rÃ©section R0",
-        "Frailty": "FragilitÃ© globale",
+        "Surgery R0": "Probabilité de résection R0",
+        "Frailty": "Fragilité globale",
     }
     for name, weight, description in result.primary_factors:
         mapped.append((rename.get(str(name), str(name)), float(weight), str(description)))
@@ -281,25 +291,25 @@ def _build_response_sentence(result: EngineResultV4) -> str:
     ace_current = float(profile.get("ace_current", 0.0))
 
     if clinical_response == "complete":
-        sentence = "La tumeur parait avoir tres bien repondu au traitement."
+        sentence = "La tumeur paraît avoir très bien répondu au traitement."
     elif clinical_response == "near_complete":
-        sentence = "La reponse au traitement parait tres favorable."
+        sentence = "La réponse au traitement paraît très favorable."
     elif clinical_response == "partial":
-        sentence = "La reponse au traitement reste partielle."
+        sentence = "La réponse au traitement reste partielle."
     else:
-        sentence = "La reponse au traitement reste insuffisante."
+        sentence = "La réponse au traitement reste insuffisante."
 
     if residual_cm > 0.0:
-        sentence = sentence[:-1] + f", avec une lesion residuelle estimee a {residual_cm:.1f} cm."
+        sentence = sentence[:-1] + f", avec une lésion résiduelle estimée à {residual_cm:.1f} cm."
 
     if ace_baseline > 0.0 and ace_current > 0.0:
         ace_drop = (ace_baseline - ace_current) / ace_baseline
         if ace_drop >= 0.5:
-            sentence += f" Le marqueur ACE a baisse d'environ {ace_drop * 100.0:.0f}%, ce qui est rassurant."
+            sentence += f" Le marqueur ACE a baissé d'environ {ace_drop * 100.0:.0f}%, ce qui est rassurant."
         elif ace_current > ace_baseline * 1.1:
-            sentence += " Le marqueur ACE est remonte, ce qui appelle a la prudence."
+            sentence += " Le marqueur ACE est remonté, ce qui appelle à la prudence."
         elif ace_current > 5.0:
-            sentence += " Le marqueur ACE reste eleve et justifie une vigilance supplementaire."
+            sentence += " Le marqueur ACE reste élevé et justifie une vigilance supplémentaire."
 
     return sentence
 
@@ -313,18 +323,18 @@ def _build_patient_friendly_summary(result: EngineResultV4) -> str:
     if recommendation == "watch_wait":
         surveillance_load = _find_complication_value(watch_wait.complications, "surveillance", default=45.0)
         burden_sentence = (
-            "Cette option demande un suivi tres regulier par IRM, endoscopie et consultation."
+            "Cette option demande un suivi très régulier par IRM, endoscopie et consultation."
             if surveillance_load >= 55.0
-            else "Cette option reste possible a condition d'accepter un suivi regulier."
+            else "Cette option reste possible à condition d'accepter un suivi régulier."
         )
         return " ".join(
             [
-                "Au vu des donnees actuelles, une surveillance active sans chirurgie immediate semble etre l'option la plus adaptee.",
+                "Au vu des données actuelles, une surveillance active sans chirurgie immédiate semble être l'option la plus adaptée.",
                 response_sentence,
                 (
-                    f"Dans ce scenario, le risque de repousse locale a 2 ans est estime a "
-                    f"{_format_percent(watch_wait.local_recurrence_2y)} et la chance de rester sans rechute a 5 ans "
-                    f"a {_format_percent(watch_wait.survival_5y)}."
+                    f"Dans ce scénario, le risque de repousse locale à 2 ans est estimé à "
+                    f"{_format_percent(watch_wait.local_recurrence_2y)} et la chance de rester sans rechute à 5 ans "
+                    f"à {_format_percent(watch_wait.survival_5y)}."
                 ),
                 burden_sentence,
             ]
@@ -333,16 +343,16 @@ def _build_patient_friendly_summary(result: EngineResultV4) -> str:
     if recommendation == "surgery":
         lars_risk = _find_complication_value(surgery.complications, "lars", default=surgery.major_complication)
         impact_sentence = (
-            f"Le principal inconvenient est un risque de complication importante d'environ {_format_percent(surgery.major_complication)}, "
-            f"avec un risque de troubles digestifs durables estime a {_format_percent(lars_risk)}."
+            f"Le principal inconvénient est un risque de complication importante d'environ {_format_percent(surgery.major_complication)}, "
+            f"avec un risque de troubles digestifs durables estimé à {_format_percent(lars_risk)}."
         )
         return " ".join(
             [
-                "Au vu des donnees actuelles, la chirurgie semble etre l'option la plus sure pour mieux controler la maladie.",
+                "Au vu des données actuelles, la chirurgie semble être l'option la plus sûre pour mieux contrôler la maladie.",
                 response_sentence,
                 (
-                    f"Dans ce scenario, la chance de rester sans rechute a 5 ans est estimee a "
-                    f"{_format_percent(surgery.survival_5y)} et le risque de recidive locale a 5 ans a "
+                    f"Dans ce scénario, la chance de rester sans rechute à 5 ans est estimée à "
+                    f"{_format_percent(surgery.survival_5y)} et le risque de récidive locale à 5 ans à "
                     f"{_format_percent(surgery.local_recurrence_5y)}."
                 ),
                 impact_sentence,
@@ -351,14 +361,14 @@ def _build_patient_friendly_summary(result: EngineResultV4) -> str:
 
     return " ".join(
         [
-            "Les donnees actuelles ne permettent pas de privilegier clairement une seule option de traitement.",
+            "Les données actuelles ne permettent pas de privilégier clairement une seule option de traitement.",
             response_sentence,
             (
-                f"La chirurgie offrirait une chance de rester sans rechute a 5 ans d'environ "
-                f"{_format_percent(surgery.survival_5y)}, tandis que la surveillance active exposerait a un risque "
-                f"de repousse locale d'environ {_format_percent(watch_wait.local_recurrence_2y)} a 2 ans."
+                f"La chirurgie offrirait une chance de rester sans rechute à 5 ans d'environ "
+                f"{_format_percent(surgery.survival_5y)}, tandis que la surveillance active exposerait à un risque "
+                f"de repousse locale d'environ {_format_percent(watch_wait.local_recurrence_2y)} à 2 ans."
             ),
-            "Une discussion detaillee avec l'equipe soignante est necessaire pour choisir l'option la plus adaptee.",
+            "Une discussion détaillée avec l'équipe soignante est nécessaire pour choisir l'option la plus adaptée.",
         ]
     )
 
@@ -373,21 +383,21 @@ def _build_legacy_rationale(result: EngineResultV4, recommended_scenario: str) -
     ]
 
     surgery_benefits = [
-        f"ProbabilitÃ© R0: {result.surgery.r0_probability:.1f}%",
-        f"DFS Ã  5 ans: {result.surgery.survival_5y:.1f}%",
+        f"Probabilité R0: {result.surgery.r0_probability:.1f}%",
+        f"DFS à 5 ans: {result.surgery.survival_5y:.1f}%",
     ]
     surgery_risks = [
         f"Complications majeures: {result.surgery.major_complication:.1f}%",
-        f"RÃ©cidive locale Ã  5 ans: {result.surgery.local_recurrence_5y:.1f}%",
+        f"Récidive locale à 5 ans: {result.surgery.local_recurrence_5y:.1f}%",
     ] + _scenario_complication_lines("surgery", result.surgery)
 
     ww_benefits = [
-        f"Score d'Ã©ligibilitÃ©: {result.watch_wait.eligibility_score:.1f}/100",
-        f"QualitÃ© de vie projetÃ©e: {result.watch_wait.qol_score:.1f}/100",
+        f"Score d'éligibilité: {result.watch_wait.eligibility_score:.1f}/100",
+        f"Qualité de vie projetée: {result.watch_wait.qol_score:.1f}/100",
     ]
     ww_risks = [
-        f"Repousse locale Ã  2 ans: {result.watch_wait.local_recurrence_2y:.1f}%",
-        f"MÃ©tastases Ã  5 ans: {result.watch_wait.distant_metastasis_5y:.1f}%",
+        f"Repousse locale à 2 ans: {result.watch_wait.local_recurrence_2y:.1f}%",
+        f"Métastases à 5 ans: {result.watch_wait.distant_metastasis_5y:.1f}%",
     ] + _scenario_complication_lines("watch_and_wait", result.watch_wait)
 
     strength = str(result.consensus.recommendation_strength)
@@ -396,7 +406,7 @@ def _build_legacy_rationale(result: EngineResultV4, recommended_scenario: str) -
 
     recommendation_text = _fr(str(result.consensus.rationale))
     if result.consensus.counterfactuals:
-        recommendation_text = f"{recommendation_text} Contrefactuel cle: {_fr(result.consensus.counterfactuals[0])}"
+        recommendation_text = f"{recommendation_text} Contrefactuel clé: {_fr(result.consensus.counterfactuals[0])}"
 
     return ClinicalRationale(
         primary_factors=primary,
@@ -424,7 +434,7 @@ def _build_synthetic_llm_response(result: EngineResultV4) -> MedicalLLMResponse:
         lars_risk=_find_complication_value(result.surgery.complications, "lars"),
         colostomy_risk=_find_complication_value(result.surgery.complications, "stoma"),
         r0_probability=float(result.surgery.r0_probability),
-        narrative_fr="SynthÃ¨se multi-agent assistÃ©e par le module LLM.",
+        narrative_fr="Synthèse multi-agent assistée par le module LLM.",
     )
     watch_wait = WatchWaitEstimates(
         regrowth_2y=float(result.watch_wait.local_recurrence_2y),
@@ -439,7 +449,7 @@ def _build_synthetic_llm_response(result: EngineResultV4) -> MedicalLLMResponse:
         surveillance_burden="high"
         if _find_complication_value(result.watch_wait.complications, "surveillance") >= 60
         else "moderate",
-        narrative_fr="SynthÃ¨se multi-agent assistÃ©e par le module LLM.",
+        narrative_fr="Synthèse multi-agent assistée par le module LLM.",
     )
     key_factors = [
         KeyFactor(
@@ -458,7 +468,7 @@ def _build_synthetic_llm_response(result: EngineResultV4) -> MedicalLLMResponse:
         recommendation=result.consensus.recommendation,
         recommendation_rationale=_fr(result.consensus.rationale),
         uncertainty_level=uncertainty,
-        uncertainty_reason=f"Niveau de desaccord: {result.consensus.disagreement_level}",
+        uncertainty_reason=f"Niveau de désaccord: {result.consensus.disagreement_level}",
         clinical_alerts=_build_french_alerts(result),
         key_factors=key_factors,
         patient_friendly_summary=_build_patient_friendly_summary(result),

@@ -157,7 +157,7 @@ def test_clinician_summary_stays_technical(monkeypatch) -> None:
 
     summary = _build_clinician_summary(legacy)
 
-    assert "Contrefactuel cle" in summary
+    assert "Contrefactuel" in summary
     assert "Facteurs dominants" in summary
     assert "Alerte principale" in summary
 
