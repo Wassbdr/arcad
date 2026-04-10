@@ -33,24 +33,6 @@ CHART_TEMPLATE = {
 }
 
 
-def _repair_plot_label(value: Any) -> str:
-    text = str(value)
-    if "Ã" in text or "Â" in text:
-        try:
-            text = text.encode("latin1").decode("utf-8")
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            pass
-
-    replacements = {
-        "Reponse radiologique (TRG + residu)": "Réponse radiologique (TRG + résidu)",
-        "Cinetique ACE": "Cinétique ACE",
-        "Fragilite medico-chirurgicale": "Fragilité médico-chirurgicale",
-        "Controle local attendu avec chirurgie": "Contrôle local attendu avec chirurgie",
-        "Probabilite de resection R0": "Probabilité de résection R0",
-    }
-    return replacements.get(text, text)
-
-
 def build_kaplan_meier_comparison(survival_data: Dict[str, Any]) -> go.Figure:
     """Build comparative Kaplan-Meier survival curves."""
 
@@ -98,7 +80,7 @@ def build_kaplan_meier_comparison(survival_data: Dict[str, Any]) -> go.Figure:
 
     fig.update_layout(
         title={
-            "text": "Survie sans recidive",
+            "text": "Disease-Free Survival",
             "x": 0,
             "xanchor": "left",
             "font": {"size": 16, "weight": 600},
@@ -234,11 +216,7 @@ def build_risk_category_comparison(risk_data: Dict[str, Any]) -> go.Figure:
 def build_shap_explainability(explainability_data: Dict[str, Any]) -> go.Figure:
     """Build SHAP-style feature contribution plot."""
 
-    raw_contributions = explainability_data["feature_contributions"]
-    contributions: Dict[str, float] = {}
-    for key, value in raw_contributions.items():
-        clean_key = _repair_plot_label(key)
-        contributions[clean_key] = contributions.get(clean_key, 0.0) + float(value)
+    contributions = explainability_data["feature_contributions"]
 
     # Sort by absolute contribution
     sorted_items = sorted(contributions.items(), key=lambda x: abs(x[1]), reverse=True)

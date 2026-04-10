@@ -6,9 +6,7 @@ high-fidelity CRF simulator format.
 
 from __future__ import annotations
 
-from typing import Any
-
-from predi_care.engine.patient_types import PatientInput
+from predi_care.engine.brain_engine import PatientInput
 from predi_care.engine.crf_simulator import CRFInput
 
 
@@ -34,11 +32,6 @@ def map_patient_input_to_crf(patient: PatientInput) -> CRFInput:
     yct_stage = _map_ct_to_yct(patient["ct_stage"])
     ycn_stage = _map_cn_to_ycn(patient["cn_stage"])
 
-    patient_payload: dict[str, Any] = dict(patient)
-
-    residual_ratio = float(patient_payload.get("residual_tumor_ratio", patient["residual_tumor_ratio"]))
-    imaging_quality = str(patient_payload.get("imaging_quality", patient["imaging_quality"]))
-
     # === TRG Score (derive from residual_tumor_ratio) ===
     # TRG 1-5 scale:
     # 1 = Complete response (0% residual)
@@ -46,26 +39,26 @@ def map_patient_input_to_crf(patient: PatientInput) -> CRFInput:
     # 3 = Moderate (10-50% residual)
     # 4 = Minimal (<50% regression)
     # 5 = No response
-    trg_score = _derive_trg_from_residual(residual_ratio)
+    trg_score = _derive_trg_from_residual(patient["residual_tumor_ratio"])
 
     # === Digital Rectal Exam (estimate from residual_tumor_ratio) ===
     # If residual very low, assume normal TR
-    if residual_ratio < 10:
+    if patient["residual_tumor_ratio"] < 10:
         digital_rectal_exam = "normal"
-    elif residual_ratio < 50:
+    elif patient["residual_tumor_ratio"] < 50:
         digital_rectal_exam = "not_done"  # Uncertain
     else:
         digital_rectal_exam = "abnormal"
 
-    # === ASA Score (use direct value if available, otherwise estimate) ===
-    asa_score = patient.get("asa_score") or _estimate_asa_from_age_ecog(patient["age"], patient["performance_status"])
+    # === ASA Score (estimate from age and performance status) ===
+    asa_score = _estimate_asa_from_age_ecog(patient["age"], patient["performance_status"])
 
     # === ECOG (direct mapping) ===
     ecog_performance = patient["performance_status"]
 
-    # === Tumor Height (use distance_marge_anale if provided) ===
-    tumor_height_cm = float(patient.get("distance_marge_anale", 8.0))
-    tumor_height_cm = max(0.0, min(15.0, tumor_height_cm))
+    # === Tumor Height (default placeholder) ===
+    # Not in original PatientInput, use median value
+    tumor_height_cm = 8.0  # Default: mid-rectum
 
     # === Age (direct) ===
     age = patient["age"]
@@ -74,15 +67,14 @@ def map_patient_input_to_crf(patient: PatientInput) -> CRFInput:
     ace_baseline = patient["ace_baseline"]
     ace_current = patient["ace_current"]
 
-    # === CRM Status (estimate from residual, imaging, and EMVI) ===
+    # === CRM Status (estimate from residual and imaging) ===
     crm_status = _estimate_crm_status(
-        residual_ratio,
-        imaging_quality,
-        patient.get("emvi", False),
+        patient["residual_tumor_ratio"],
+        patient["imaging_quality"]
     )
 
     # === MRI Quality (direct mapping) ===
-    mri_quality = _map_imaging_quality(imaging_quality)
+    mri_quality = _map_imaging_quality(patient["imaging_quality"])
 
     return CRFInput(
         yct_stage=yct_stage,
@@ -172,7 +164,7 @@ def _estimate_asa_from_age_ecog(age: int, ecog: int) -> int:
         return 4
 
 
-def _estimate_crm_status(residual_ratio: float, imaging_quality: str, emvi: bool = False) -> str:
+def _estimate_crm_status(residual_ratio: float, imaging_quality: str) -> str:
     """Estimate CRM (Circumferential Resection Margin) status.
 
     CRM is critical for surgery outcomes:
@@ -180,17 +172,19 @@ def _estimate_crm_status(residual_ratio: float, imaging_quality: str, emvi: bool
     - Threatened: 1-2mm clearance
     - Positive: <1mm clearance
 
-    Heuristic based on residual tumor burden, imaging, and EMVI.
+    Heuristic based on residual tumor burden and imaging:
+    - Low residual + high imaging quality → likely negative
+    - Moderate residual → threatened
+    - High residual or poor imaging → uncertain/threatened
     """
-    # EMVI positive is a strong indicator of threatened/positive CRM
-    if emvi and residual_ratio >= 30:
-        return "positive"
-    if emvi:
-        return "threatened"
     if residual_ratio < 10 and imaging_quality == "Elevee":
+        return "negative"  # Good prognosis
+    elif residual_ratio < 30:
+        return "negative"  # Likely clear
+    elif residual_ratio < 60:
         return "threatened"  # Borderline
-
-    return "threatened"  # Conservative estimate
+    else:
+        return "threatened"  # Conservative estimate
 
 
 def _map_imaging_quality(imaging_quality: str) -> str:
@@ -207,24 +201,3 @@ def _map_imaging_quality(imaging_quality: str) -> str:
         "Basse": "low",
     }
     return mapping.get(imaging_quality, "medium")  # Default to medium
-
-
-def _normalize_crm_status(value: Any) -> str | None:
-    """Normalize an optional crm_status hint value."""
-    if value is None:
-        return None
-
-    normalized = str(value).strip().lower()
-    if normalized in {"negative", "threatened", "positive"}:
-        return normalized
-    return None
-
-
-def _coerce_optional_float(value: Any, default: float | None) -> float | None:
-    """Coerce optional scalar values to float with safe default fallback."""
-    if value is None:
-        return default
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return default
