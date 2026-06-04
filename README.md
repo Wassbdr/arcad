@@ -201,9 +201,6 @@ pip install -r requirements.txt
 
 Le projet est migre vers width="stretch" pour compatibilite apres 2025-12-31.
 
-## License
-
-A definir selon les regles du hackathon et de l'equipe projet.
 
 ## Credits
 
